@@ -1,0 +1,1 @@
+unsigned int soma_divisores(unsigned int n);

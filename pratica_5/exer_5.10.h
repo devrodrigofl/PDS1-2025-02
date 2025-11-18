@@ -1,0 +1,1 @@
+int inverte(unsigned int n);

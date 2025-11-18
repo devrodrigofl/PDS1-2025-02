@@ -1,0 +1,1 @@
+int soma_digitos_pares (unsigned int n);
