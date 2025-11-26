@@ -23,6 +23,7 @@ int main() {
 
   al_register_event_source(queue, al_get_keyboard_event_source());
   al_register_event_source(queue, al_get_timer_event_source(timer));
+  
   unsigned char keyboard_keys[ALLEGRO_KEY_MAX];
   ClearKeyboardKeys(keyboard_keys);
   ALLEGRO_EVENT event;

@@ -1,3 +1,5 @@
+all: clean game run
+
 clean:
 	rm *.out
 
@@ -11,3 +13,6 @@ game:
 		allegro_font-5 \
 		allegro_image-5 allegro_primitives-5 \
 		 --libs --cflags`
+
+run: 
+	./game.out
