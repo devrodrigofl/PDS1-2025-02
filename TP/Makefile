@@ -5,6 +5,7 @@ game:
 	gcc main.c -o game.out \
 		utils.c \
 		renderer.c \
+		objects.c\
 		-lm -g\
 		`pkg-config allegro-5 allegro_main-5 \
 		allegro_font-5 \
