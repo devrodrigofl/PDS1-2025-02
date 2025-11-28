@@ -42,12 +42,36 @@ void FillRenderer(Renderer* renderer) {
       al_create_bitmap(DISPLAY_BUFFER_WIDTH, DISPLAY_BUFFER_HEIGHT);
   must_init(renderer->display_buffer, "display buffer");
 
+  //add the background images
+  renderer->background_1 = 
+      al_load_bitmap("assets/back 1.png");
+  must_init(renderer->background_1, "back1");
+
+  renderer->background_2 = 
+      al_load_bitmap("assets/back 2.png");
+  must_init(renderer->background_2, "back2");
+
+  renderer->background_3 = 
+      al_load_bitmap("assets/back 3.png");    
+  must_init(renderer->background_3, "back3");
+
+  renderer->background_4 = 
+      al_load_bitmap("assets/back 4.png");    
+  must_init(renderer->background_4, "back4");
+
   renderer->font = al_create_builtin_font();
   must_init(renderer->font, "font");
 }
 
 void RenderBackground(Renderer* renderer) {
   al_clear_to_color(al_map_rgb(0, 0, 0));
+
+  al_draw_bitmap(renderer->background_1, 0, 0, 0);
+  al_draw_bitmap(renderer->background_2, 0, 0, 0);
+  al_draw_bitmap(renderer->background_3, 0, 0, 0);
+  al_draw_bitmap(renderer->background_4, 0, 0, 0);
+  
+
 }
 
 void RenderDeck(Renderer* renderer, int x_left, int y_top) {
@@ -152,4 +176,9 @@ void ClearRenderer(Renderer* renderer) {
   al_destroy_display(renderer->display);
   al_destroy_bitmap(renderer->display_buffer);
   al_destroy_font(renderer->font);
+  //clear added backgrounds
+  al_destroy_bitmap(renderer->background_1);
+  al_destroy_bitmap(renderer->background_2);
+  al_destroy_bitmap(renderer->background_3);
+  al_destroy_bitmap(renderer->background_4);
 }
