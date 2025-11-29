@@ -7,6 +7,7 @@
 typedef struct {
   ALLEGRO_DISPLAY* display;
   ALLEGRO_BITMAP* display_buffer;
+  
   //add the background images
   ALLEGRO_BITMAP *background_1;
   ALLEGRO_BITMAP *background_2;

@@ -42,7 +42,7 @@ void FillRenderer(Renderer* renderer) {
       al_create_bitmap(DISPLAY_BUFFER_WIDTH, DISPLAY_BUFFER_HEIGHT);
   must_init(renderer->display_buffer, "display buffer");
 
-  //add the background images
+  //load the background images
   renderer->background_1 = 
       al_load_bitmap("assets/back 1.png");
   must_init(renderer->background_1, "back1");
