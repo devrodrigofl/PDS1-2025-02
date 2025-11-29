@@ -2,6 +2,8 @@
 #define ENTITIES_H
 
 #include "cards.h"
+#include <string.h>
+#include <stdlib.h>
 
 typedef enum EnemyType {
     weak = 0,
@@ -30,12 +32,20 @@ typedef struct Player{
 
 typedef struct Enemy{
     Status status;
-    int current_energy;
-    int max_energy;
+    EnemyType type;
     EnemyAction actions[3];
+    int action_count;
 } Enemy;
 
+void init_status(Status* status, int max_hp, int max_shield);
+
 void buildPlayer(Player* player);
+
+int enemyEffect(int cost);
+int numActions(EnemyType type);
+int actionsCost(EnemyType type);
+
+void buildEnemy(Enemy* enemy);
 
 void setActions(Enemy* enemy);
 
