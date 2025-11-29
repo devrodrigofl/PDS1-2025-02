@@ -7,7 +7,7 @@ game:
 	gcc main.c -o game.out \
 		utils.c \
 		renderer.c \
-		objects.c\
+		entities.c\
 		cards.c\
 		-lm -g\
 		`pkg-config allegro-5 allegro_main-5 \

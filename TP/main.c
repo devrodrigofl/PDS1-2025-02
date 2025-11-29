@@ -3,17 +3,21 @@
 #include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "constants.h"
 #include "renderer.h"
 #include "utils.h"
-#include "objects.h"
+#include "entities.h"
+#include "cards.h"
 
 int main() {
   must_init(al_init(), "allegro");
   must_init(al_init_image_addon(), "allegro");
   must_init(al_init_primitives_addon(), "primitives");
   must_init(al_install_keyboard(), "keyboard");
+  
+  srand(time(0));
 
   ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0);
   must_init(timer, "timer");
@@ -30,10 +34,15 @@ int main() {
 
   Renderer renderer;
   FillRenderer(&renderer);
-  al_register_event_source(queue,
-                           al_get_display_event_source(renderer.display));
+  al_register_event_source(queue, al_get_display_event_source(renderer.display));
+  
+  // remove this later
+  Deck deck; 
+  generateDeck(&deck);   
+  ShuffleDeck(&deck);
+  printDeck(deck);
 
-  al_start_timer(timer);
+  al_start_timer(timer);  
   while (1) {
     al_wait_for_event(queue, &event);
     int done = 0, print_combat = 0, redraw = 0;
@@ -65,6 +74,7 @@ int main() {
       break;
     }
     // You want to put your combat logic here.
+    
     if (redraw) {
       Render(&renderer);
       redraw = 0;
