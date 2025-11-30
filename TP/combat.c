@@ -30,6 +30,24 @@ void takeDamage(Status* status, int effect){
     }
 }
 
+void executeAction(CombatManager* manager, Status* user, Status* target, type_of_card type, int effect) {
+    if (type == attack) {
+        printf("attack: %d of damage!\n", effect);
+        takeDamage(target, effect);
+    } 
+    else if (type == defense) {
+        printf("Defense: +%d of shield!\n", effect);
+        addShield(user, effect);
+    }
+    else if (type == especial) {
+        printf("Especial: new hand!\n");
+        
+        discardAllCards(&manager->player->hand, &manager->player->discard_pile);
+        buildHand(&manager->player->hand, &manager->player->deck, &manager->player->discard_pile, 5);
+    }
+}
+
+
 void startCombat(CombatManager* manager, Player* player, EnemyGroup* enemies) {
     manager->player = player;
     manager->enemies = enemies;
@@ -62,20 +80,7 @@ void enemyTurn(CombatManager* manager) {
             current_enemy->status.current_shield = 0;
             
             EnemyAction action = current_enemy->actions[current_enemy->action_count];
-            
-            if (action.type == attack) {
-                //adicioar nome aos inimigos forte e fraco depois
-                printf("Enemy attack causing %d of damage!\n", action.effect);
-                
-                takeDamage(&manager->player->status, action.effect);
-                
-                // (Aqui seria o lugar para iniciar a animação ANIM_GOING)
-                // e->status.anim_state = ANIM_GOING;
-            } 
-            else if (action.type == defense) {
-                printf("enemy defends, gaining %d shield points!\n", action.effect);
-                addShield(&current_enemy->status, action.effect);
-            }
+            executeAction(manager, &current_enemy->status, &manager->player->status, action.type, action.effect);
             
             //prepare next action
             current_enemy->action_count++;
@@ -108,5 +113,136 @@ void combatUpdate(CombatManager* manager) {
     if (combatState(manager->enemies)) {
         manager->state = victory;
         printf("Victory! all enemies were defeated.\n");
+    }
+}
+
+int isKeyPressed(unsigned char* keys, int key_code) {
+    return keys[key_code] & GAME_KEY_SEEN;
+}
+
+void moveCursor(CombatManager* manager, CursorMovementDirection direction){
+    if (manager->input_mode == INPUT_SELECT_CARD) {
+        int max_idex = manager->player->hand.deck_size - 1;
+        
+        //between cards
+        if (direction == MOVE_LEFT) {
+            if (manager->selected_card_index > 0) {
+                manager->selected_card_index--;
+            }
+        } 
+        else if (direction == MOVE_RIGHT) {
+            if (manager->selected_card_index < max_idex) {
+                manager->selected_card_index++;
+            }
+        }
+    }
+    
+    else if (manager->input_mode == INPUT_SELECT_TARGET) {
+        int max_idx = manager->enemies->count - 1;
+
+        //between enemies
+        if (direction == MOVE_LEFT) {
+            if (manager->selected_target_index > 0) {
+                manager->selected_target_index--;
+            }
+        } 
+        else if (direction == MOVE_RIGHT) {
+            if (manager->selected_target_index < max_idx) {
+                manager->selected_target_index++;
+            }
+        }
+    }
+}
+
+void combatHandleInput(CombatManager* manager, unsigned char* keys) {
+    //check if it's the player's turn
+    if (manager->state != player_turn) return;
+
+    if (isKeyPressed(keys, ALLEGRO_KEY_LEFT)) {
+        moveCursor(manager, MOVE_LEFT);
+    }
+    if (isKeyPressed(keys, ALLEGRO_KEY_RIGHT)) {
+        moveCursor(manager, MOVE_RIGHT);
+    }
+
+    if (isKeyPressed(keys, ALLEGRO_KEY_ENTER)) {
+        
+        //choosing card
+        if (manager->input_mode == INPUT_SELECT_CARD) {
+            
+            // empty hand
+            if (manager->player->hand.deck_size == 0) return;
+
+            Card* card_selected = &manager->player->hand.cards[manager->selected_card_index];
+
+            // check for suficient energy
+            if (manager->player->current_energy >= card_selected->energy_cost) {
+                
+                //attack chose target
+                if (card_selected->type == attack) {
+                    manager->input_mode = INPUT_SELECT_TARGET;
+                    manager->selected_target_index = 0;
+                    printf("Selecione o alvo\n");
+                } 
+                //defense and especial execute action
+                else {
+                    // remove energy
+                    manager->player->current_energy -= card_selected->energy_cost;
+
+                    executeAction(manager, &manager->player->status, &manager->player->status, card_selected->type, card_selected->effect);
+
+                    // throw card in discard pile
+                    if (card_selected->type != especial) {
+                        playedCard(&manager->player->hand, manager->selected_card_index, &manager->player->discard_pile);
+                    }
+
+                    if (manager->selected_card_index >= manager->player->hand.deck_size) {
+                        manager->selected_card_index = manager->player->hand.deck_size - 1;
+                        if (manager->selected_card_index < 0) manager->selected_card_index = 0;
+                    }
+                }
+            } else printf("Sem energia suficiente! (Custo: %d)\n", card_selected->energy_cost);
+        }
+        
+        //choosing enemy
+        if (manager->input_mode == INPUT_SELECT_TARGET) {
+            
+            Enemy* target = &manager->enemies->enemy[manager->selected_target_index];
+
+            if (target->status.current_hp > 0) {
+                
+                Card* card_selected = &manager->player->hand.cards[manager->selected_card_index];
+                
+                // remove energy
+                manager->player->current_energy -= card_selected->energy_cost;
+                
+                printf("Ataque realizado! Dano: %d\n", card_selected->effect);
+
+                executeAction(manager, &manager->player->status, &target->status, card_selected->type, card_selected->effect);
+                
+                // throw card in discard pile
+                playedCard(&manager->player->hand, manager->selected_card_index, &manager->player->discard_pile);
+
+                manager->input_mode = INPUT_SELECT_CARD;
+                
+                if (manager->selected_card_index >= manager->player->hand.deck_size) {
+                    manager->selected_card_index = manager->player->hand.deck_size - 1;
+                    if (manager->selected_card_index < 0) manager->selected_card_index = 0;
+                }
+            } else {
+                printf("target invalido (ja morreu)!\n");
+            }
+        }
+    }
+
+    if (isKeyPressed(keys, ALLEGRO_KEY_ESCAPE)) {
+        
+        if (manager->input_mode == INPUT_SELECT_TARGET) {
+            printf("Ataque cancelado. Voltando para a mao.\n");
+            manager->input_mode = INPUT_SELECT_CARD;
+        } 
+        else {
+            endPlayerTurn(manager);
+        }
     }
 }
