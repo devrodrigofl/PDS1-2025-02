@@ -27,6 +27,7 @@ typedef struct Status{
 typedef struct Player{
     Status status;
     Deck deck;
+    Deck hand;
     Deck discard_pile;
     int current_energy;
     int max_energy;

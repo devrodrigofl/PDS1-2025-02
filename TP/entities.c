@@ -16,6 +16,9 @@ void buildPlayer(Player* player) {
     generateDeck(&player->deck);
     ShuffleDeck(&player->deck);
 
+    player->hand.deck_size = 0;
+    player->hand.max_size = 20;
+
     player->discard_pile.deck_size = 0;
     player->discard_pile.max_size = 20;
 }

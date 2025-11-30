@@ -106,3 +106,57 @@ void printDeck (Deck deck) {
         printf("\n[%d]\n\tType: %s \n\tCost: %d \n\tEffect: %d \n", i, type, deck.cards[i].energy_cost, deck.cards[i].effect);
     }
 }
+
+void moveCard(Deck* source, Deck* destination) {
+    if (source->deck_size <= 0) return;
+    if (destination->deck_size >= 20) return;
+
+    //copy the top card of source
+    Card top = source->cards[source->deck_size - 1];
+    source->deck_size--;
+
+    //paste on the top spot of destination
+    destination->cards[destination->deck_size] = top;
+    destination->deck_size++;
+}
+
+void discardAllCards(Deck* source, Deck* destination) {
+    while (source->deck_size > 0) {
+        move_card(source, destination);
+    }
+}
+
+void drawCards(Deck* hand, Deck* deck, Deck* discard_pile, int numCards) {
+    for (int i = 0; i < numCards; i++) {
+        //if the buy pile is empty
+        if (deck->deck_size == 0) {
+            //and the discard pile have cards
+            if(discard_pile->deck_size > 0) {
+                //move everything to the buy pile and shuffle
+                discardAllCards(discard_pile, deck);
+                ShuffleDeck(deck);
+            } else break;
+        }
+        moveCard(deck, hand);
+    }
+}
+
+void playedCard(Deck* hand, int cardIndex, Deck* discard_pile) {
+
+    if (cardIndex < 0 || cardIndex >= hand->deck_size) return;
+    if (discard_pile->deck_size >= 20) return;
+
+
+    Card played_card = hand->cards[cardIndex];
+
+    played_card.status = used; 
+    
+    discard_pile->cards[discard_pile->deck_size] = played_card;
+    discard_pile->deck_size++;
+
+    for (int i = cardIndex; i < hand->deck_size - 1; i++) {
+        hand->cards[i] = hand->cards[i + 1];
+    }
+
+    hand->deck_size--;
+}

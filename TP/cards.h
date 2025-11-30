@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef enum type_of_card{
     attack = 0,
@@ -36,5 +37,13 @@ void generateDeck (Deck* deck);
 void ShuffleDeck(Deck* deck);
 
 void printDeck (Deck deck);
+
+void moveCard(Deck* source, Deck* destination);
+
+void discardAllCards(Deck* source, Deck* destination);
+
+void drawCards(Deck* hand, Deck* deck, Deck* discard_pile, int numCards);
+
+void playedCard(Deck* hand, int cardIndex, Deck* discard_pile);
 
 #endif
