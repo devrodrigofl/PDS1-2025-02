@@ -10,6 +10,7 @@
 #include "utils.h"
 #include "entities.h"
 #include "cards.h"
+#include "combat.h"
 
 int main() {
   must_init(al_init(), "allegro");

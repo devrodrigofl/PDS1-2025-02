@@ -9,6 +9,7 @@ game:
 		renderer.c \
 		entities.c\
 		cards.c\
+		combat.c\
 		-lm -g\
 		`pkg-config allegro-5 allegro_main-5 \
 		allegro_font-5 \
