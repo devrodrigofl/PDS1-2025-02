@@ -56,22 +56,21 @@ void buildEnemy(Enemy* enemy) {
 
     initStatus(&enemy->status, hp, hp);
 
-    enemy->action_count = numActions(enemy->type);
+    enemy->action_count = 0;
+    enemy->num_actions = numActions(enemy->type);
 
     int check_cost = 0;
     int check_attack = 0;
 
-    for(int i = 0; i < enemy->action_count; i++) {
+    for(int i = 0; i < enemy->num_actions; i++) {
 
-        if (i == enemy->action_count - 1 && check_attack == 0) {
+        if (i == enemy->num_actions - 1 && check_attack == 0) {
             enemy->actions[i].type = attack;
         } else {
             enemy->actions[i].type = (rand() % 2 == 0) ? attack : defense;
         }
 
-        if (enemy->actions[i].type == attack) {
-            check_attack = 1;
-        }
+        if (enemy->actions[i].type == attack) check_attack = 1;
         
         int cost = actionsCost(enemy->type);
 
@@ -101,20 +100,20 @@ void buildEnemyGroup(EnemyGroup* group) {
     for (int i = 0; i < group->count; i++) {
         //strong enemy probability
         if (!strong_spawned && (rand() % 100 < 5)) { 
-            group->enemies[i].type = strong;
-            buildEnemy(&group->enemies[i]);
+            group->enemy[i].type = strong;
+            buildEnemy(&group->enemy[i]);
             strong_spawned = 1;
         }
         else {
-            group->enemies[i].type = weak;
-            buildEnemy(&group->enemies[i]);
+            group->enemy[i].type = weak;
+            buildEnemy(&group->enemy[i]);
         }
     }
 }
 
-int combatState(EnemyGroup* group) {
-    for (int i = 0; i < group->count; i++) {
-        if (group->enemies[i].status.current_hp > 0) {
+int combatState(EnemyGroup* enemies) {
+    for (int i = 0; i < enemies->count; i++) {
+        if (enemies->enemy[i].status.current_hp > 0) {
             return 0;
         }
     }

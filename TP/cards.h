@@ -42,7 +42,7 @@ void moveCard(Deck* source, Deck* destination);
 
 void discardAllCards(Deck* source, Deck* destination);
 
-void drawCards(Deck* hand, Deck* deck, Deck* discard_pile, int numCards);
+void buildHand(Deck* hand, Deck* deck, Deck* discard_pile, int numCards);
 
 void playedCard(Deck* hand, int cardIndex, Deck* discard_pile);
 

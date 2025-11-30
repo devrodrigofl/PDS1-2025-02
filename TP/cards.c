@@ -126,7 +126,7 @@ void discardAllCards(Deck* source, Deck* destination) {
     }
 }
 
-void drawCards(Deck* hand, Deck* deck, Deck* discard_pile, int numCards) {
+void buildHand(Deck* hand, Deck* deck, Deck* discard_pile, int numCards) {
     for (int i = 0; i < numCards; i++) {
         //if the buy pile is empty
         if (deck->deck_size == 0) {

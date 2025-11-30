@@ -38,12 +38,13 @@ typedef struct Enemy{
     EnemyType type;
     EnemyAction actions[3];
     int action_count;
+    int num_actions;
     float x_axis;
     float y_axis;
 } Enemy;
 
 typedef struct {
-    Enemy enemies[MAX_ENEMIES];
+    Enemy enemy[MAX_ENEMIES];
     int count;
     int active_count;
 } EnemyGroup;
