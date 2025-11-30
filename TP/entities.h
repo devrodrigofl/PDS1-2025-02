@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#define MAX_ENEMIES 2
+
 typedef enum EnemyType {
     weak = 0,
     strong = 1,
@@ -35,21 +37,26 @@ typedef struct Enemy{
     EnemyType type;
     EnemyAction actions[3];
     int action_count;
+    float x_axis;
+    float y_axis;
 } Enemy;
 
-void init_status(Status* status, int max_hp, int max_shield);
+typedef struct {
+    Enemy enemies[MAX_ENEMIES];
+    int count;
+    int active_count;
+} EnemyGroup;
+
+void initStatus(Status* status, int max_hp, int max_shield);
 
 void buildPlayer(Player* player);
 
 int enemyEffect(int cost);
 int numActions(EnemyType type);
 int actionsCost(EnemyType type);
-
 void buildEnemy(Enemy* enemy);
 
-void setActions(Enemy* enemy);
-
-
-
+void buildEnemyGroup(EnemyGroup* group);
+int combatState(EnemyGroup* group);
 
 #endif

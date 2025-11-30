@@ -1,6 +1,6 @@
 #include "entities.h"
 
-void init_status(Status* status, int max_hp, int max_shield) {
+void initStatus(Status* status, int max_hp, int max_shield) {
     status->max_hp = max_hp;
     status->current_hp = max_hp;
     status->current_shield = 0;
@@ -8,7 +8,7 @@ void init_status(Status* status, int max_hp, int max_shield) {
 }
 
 void buildPlayer(Player* player) {
-    init_status(&player->status, 100, 100);
+    initStatus(&player->status, 100, 100);
 
     player->max_energy = 3;
     player->current_energy = 3;
@@ -51,25 +51,69 @@ void buildEnemy(Enemy* enemy) {
     if(enemy->type) hp = 40 + (rand() % 61);
     else hp = 10 + (rand() % 21);
 
-    init_status(&enemy->status, hp, hp);
+    initStatus(&enemy->status, hp, hp);
 
     enemy->action_count = numActions(enemy->type);
 
-    int check = 0;
+    int check_cost = 0;
+    int check_attack = 0;
 
     for(int i = 0; i < enemy->action_count; i++) {
-        enemy->actions[i].type = (rand() % 2 == 0) ? attack : defense;
 
+        if (i == enemy->action_count - 1 && check_attack == 0) {
+            enemy->actions[i].type = attack;
+        } else {
+            enemy->actions[i].type = (rand() % 2 == 0) ? attack : defense;
+        }
+
+        if (enemy->actions[i].type == attack) {
+            check_attack = 1;
+        }
+        
         int cost = actionsCost(enemy->type);
 
         //check if cost 1 has already occurred
-        if (cost == 1 && check == 0) check = 1;
-        else if(cost == 1 && check == 1) {
-            while(cost == 1) {
-                cost = actionsCost(enemy->type);
+        if (enemy->type == strong) {
+            if (cost == 1) {
+                if (check_cost == 0) {
+                    check_cost = 1;
+                } else {
+                    while (cost == 1) {
+                        cost = actionsCost(enemy->type);
+                    }
+                }
             }
         }
 
         enemy->actions[i].effect = enemyEffect(cost);  
     }
+}
+
+void buildEnemyGroup(EnemyGroup* group) {
+    group->count = MAX_ENEMIES;
+    group->active_count = MAX_ENEMIES;
+
+    int strong_spawned = 0;
+
+    for (int i = 0; i < group->count; i++) {
+        //strong enemy probability
+        if (!strong_spawned && (rand() % 100 < 5)) { 
+            group->enemies[i].type = strong;
+            buildEnemy(&group->enemies[i]);
+            strong_spawned = 1;
+        }
+        else {
+            group->enemies[i].type = weak;
+            buildEnemy(&group->enemies[i]);
+        }
+    }
+}
+
+int combatState(EnemyGroup* group) {
+    for (int i = 0; i < group->count; i++) {
+        if (group->enemies[i].status.current_hp > 0) {
+            return 0;
+        }
+    }
+    return 1;
 }
