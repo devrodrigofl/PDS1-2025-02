@@ -64,7 +64,7 @@ void startPlayerTurn(CombatManager* manager) {
     //reset thge shield
     manager->player->status.current_shield = 0;
 
-    buildhand(&manager->player->hand, &manager->player->deck, &manager->player->discard_pile, 5);
+    buildHand(&manager->player->hand, &manager->player->deck, &manager->player->discard_pile, 5);
 
 }
 
@@ -99,10 +99,13 @@ void endPlayerTurn(CombatManager* manager) {
 
     enemyTurn(manager);
 
-    combat_start_player_turn(manager);
+    startPlayerTurn(manager);
 }
 
 void combatUpdate(CombatManager* manager) {
+    if (manager->state == victory || manager->state == defeat) {
+        return;
+    }
 
     if (manager->player->status.current_hp <= 0) {
         manager->state = defeat;

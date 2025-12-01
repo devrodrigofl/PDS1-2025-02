@@ -37,11 +37,23 @@ int main() {
   FillRenderer(&renderer);
   al_register_event_source(queue, al_get_display_event_source(renderer.display));
   
-  // remove this later
-  Deck deck; 
-  generateDeck(&deck);   
-  ShuffleDeck(&deck);
-  printDeck(deck);
+  // 3. INICIALIZAÇÃO DO JOGO
+    printf("=== INICIANDO O JOGO ===\n");
+
+    Player player;
+    buildPlayer(&player);
+    printf("> Player criado com %d/3 Energia e %d Cartas no Deck.\n", player.current_energy, player.deck.deck_size);
+
+    EnemyGroup enemies;
+    buildEnemyGroup(&enemies);
+    printf("> Grupo de Inimigos criado com %d inimigos.\n", enemies.count);
+
+    CombatManager combat_manager;
+    startCombat(&combat_manager, &player, &enemies);
+    printf("> Combate Iniciado! Turno do Jogador.\n");
+    printf("========================\n\n");
+
+    renderer.manager = &combat_manager;
 
   al_start_timer(timer);  
   while (1) {
@@ -54,6 +66,18 @@ int main() {
         if (keyboard_keys[ALLEGRO_KEY_Q]) {
           done = 1;
           break;
+        }
+
+        if (keyboard_keys[ALLEGRO_KEY_LEFT]) {
+            printf("erro 1");
+           combatHandleInput(&combat_manager, (unsigned char*)ALLEGRO_KEY_LEFT);\
+           printf("erro 2");
+        }
+
+        if (keyboard_keys[ALLEGRO_KEY_RIGHT]) {
+           printf("erro 3");
+           combatHandleInput(&combat_manager, (unsigned char*)ALLEGRO_KEY_RIGHT);
+           printf("erro 4");
         }
 
         for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {

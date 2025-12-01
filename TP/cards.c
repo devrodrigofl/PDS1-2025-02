@@ -122,7 +122,7 @@ void moveCard(Deck* source, Deck* destination) {
 
 void discardAllCards(Deck* source, Deck* destination) {
     while (source->deck_size > 0) {
-        move_card(source, destination);
+        moveCard(source, destination);
     }
 }
 
