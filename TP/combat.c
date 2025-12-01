@@ -162,14 +162,10 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
     if (manager->state != player_turn) return;
 
     if (isKeyPressed(keys, ALLEGRO_KEY_LEFT)) {
-        printf("antes de entrar left\n");
         moveCursor(manager, MOVE_LEFT);
-        printf("depois de entrar left\n");
     }
     if (isKeyPressed(keys, ALLEGRO_KEY_RIGHT)) {
-        printf("antes de entrar right\n");
         moveCursor(manager, MOVE_RIGHT);
-        printf("depois de entrar direita\n");
     }
 
     if (isKeyPressed(keys, ALLEGRO_KEY_ENTER)) {
@@ -182,11 +178,13 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
             printf("%d\n", manager->selected_card_index);
             Card* card_selected = &manager->player->hand.cards[manager->selected_card_index];
 
+            type_of_card played_card_type = card_selected->type;
+
             // check for suficient energy
             if (manager->player->current_energy >= card_selected->energy_cost) {
                 
                 //attack chose target
-                if (card_selected->type == attack) {
+                if (played_card_type == attack) {
                     manager->input_mode = INPUT_SELECT_TARGET;
                     manager->selected_target_index = 0;
                     printf("Selecione o alvo\n");
@@ -196,10 +194,10 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
                     // remove energy
                     manager->player->current_energy -= card_selected->energy_cost;
 
-                    executeAction(manager, &manager->player->status, &manager->player->status, card_selected->type, card_selected->effect);
+                    executeAction(manager, &manager->player->status, &manager->player->status, played_card_type, card_selected->effect);
 
                     // throw card in discard pile
-                    if (card_selected->type != especial) {
+                    if (played_card_type != especial) {
                         playedCard(&manager->player->hand, manager->selected_card_index, &manager->player->discard_pile);
                     }
 

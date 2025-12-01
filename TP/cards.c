@@ -121,22 +121,23 @@ void moveCard(Deck* source, Deck* destination) {
 }
 
 void discardAllCards(Deck* source, Deck* destination) {
-    while (source->deck_size - 1 > 0) {
+    while (source->deck_size > 0) {
         moveCard(source, destination);
     }
 }
 
 void buildHand(Deck* hand, Deck* deck, Deck* discard_pile, int numCards) {
-    for (int i = 0; i < numCards; i++) {
-        //if the buy pile is empty
-        if (deck->deck_size == 0) {
-            //and the discard pile have cards
-            if(discard_pile->deck_size > 0) {
-                //move everything to the buy pile and shuffle
-                discardAllCards(discard_pile, deck);
-                ShuffleDeck(deck);
-            }
+    //if the buy pile is empty
+    if (deck->deck_size == 0) {
+        //and the discard pile have cards
+        if(discard_pile->deck_size > 0) {
+            //move everything to the buy pile and shuffle
+            discardAllCards(discard_pile, deck);
+            ShuffleDeck(deck);
         }
+    }
+    
+    for (int i = 0; i < numCards; i++) {
         moveCard(deck, hand);
     }
 }
