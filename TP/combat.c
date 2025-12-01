@@ -51,6 +51,7 @@ void executeAction(CombatManager* manager, Status* user, Status* target, type_of
 void startCombat(CombatManager* manager, Player* player, EnemyGroup* enemies) {
     manager->player = player;
     manager->enemies = enemies;
+    manager->input_mode = INPUT_SELECT_CARD;
 
     startPlayerTurn(manager);
 }
@@ -125,8 +126,7 @@ int isKeyPressed(unsigned char* keys, int key_code) {
 
 void moveCursor(CombatManager* manager, CursorMovementDirection direction){
     if (manager->input_mode == INPUT_SELECT_CARD) {
-        int max_idex = manager->player->hand.deck_size - 1;
-        
+        int max_index = manager->player->hand.deck_size - 1;
         //between cards
         if (direction == MOVE_LEFT) {
             if (manager->selected_card_index > 0) {
@@ -134,14 +134,14 @@ void moveCursor(CombatManager* manager, CursorMovementDirection direction){
             }
         } 
         else if (direction == MOVE_RIGHT) {
-            if (manager->selected_card_index < max_idex) {
+            if (manager->selected_card_index < max_index) {
                 manager->selected_card_index++;
             }
         }
     }
     
     else if (manager->input_mode == INPUT_SELECT_TARGET) {
-        int max_idx = manager->enemies->count - 1;
+        int max_index = manager->enemies->count - 1;
 
         //between enemies
         if (direction == MOVE_LEFT) {
@@ -150,7 +150,7 @@ void moveCursor(CombatManager* manager, CursorMovementDirection direction){
             }
         } 
         else if (direction == MOVE_RIGHT) {
-            if (manager->selected_target_index < max_idx) {
+            if (manager->selected_target_index < max_index) {
                 manager->selected_target_index++;
             }
         }
@@ -162,10 +162,14 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
     if (manager->state != player_turn) return;
 
     if (isKeyPressed(keys, ALLEGRO_KEY_LEFT)) {
+        printf("antes de entrar left\n");
         moveCursor(manager, MOVE_LEFT);
+        printf("depois de entrar left\n");
     }
     if (isKeyPressed(keys, ALLEGRO_KEY_RIGHT)) {
+        printf("antes de entrar right\n");
         moveCursor(manager, MOVE_RIGHT);
+        printf("depois de entrar direita\n");
     }
 
     if (isKeyPressed(keys, ALLEGRO_KEY_ENTER)) {
@@ -175,7 +179,7 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
             
             // empty hand
             if (manager->player->hand.deck_size == 0) return;
-
+            printf("%d\n", manager->selected_card_index);
             Card* card_selected = &manager->player->hand.cards[manager->selected_card_index];
 
             // check for suficient energy

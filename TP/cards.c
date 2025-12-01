@@ -121,7 +121,7 @@ void moveCard(Deck* source, Deck* destination) {
 }
 
 void discardAllCards(Deck* source, Deck* destination) {
-    while (source->deck_size > 0) {
+    while (source->deck_size - 1 > 0) {
         moveCard(source, destination);
     }
 }
@@ -135,7 +135,7 @@ void buildHand(Deck* hand, Deck* deck, Deck* discard_pile, int numCards) {
                 //move everything to the buy pile and shuffle
                 discardAllCards(discard_pile, deck);
                 ShuffleDeck(deck);
-            } else break;
+            }
         }
         moveCard(deck, hand);
     }

@@ -53,6 +53,7 @@ int main() {
     printf("> Combate Iniciado! Turno do Jogador.\n");
     printf("========================\n\n");
 
+
     renderer.manager = &combat_manager;
 
   al_start_timer(timer);  
@@ -68,17 +69,10 @@ int main() {
           break;
         }
 
-        if (keyboard_keys[ALLEGRO_KEY_LEFT]) {
-            printf("erro 1");
-           combatHandleInput(&combat_manager, (unsigned char*)ALLEGRO_KEY_LEFT);\
-           printf("erro 2");
-        }
+        combatHandleInput(&combat_manager, keyboard_keys);
+        combatUpdate(&combat_manager);
 
-        if (keyboard_keys[ALLEGRO_KEY_RIGHT]) {
-           printf("erro 3");
-           combatHandleInput(&combat_manager, (unsigned char*)ALLEGRO_KEY_RIGHT);
-           printf("erro 4");
-        }
+        if (combat_manager.state == victory || combat_manager.state == defeat);
 
         for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
           keyboard_keys[i] &= ~GAME_KEY_SEEN;
