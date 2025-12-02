@@ -28,6 +28,9 @@ typedef struct {
   ALLEGRO_BITMAP *health_bar;
   ALLEGRO_BITMAP *energy_indicator;
 
+  ALLEGRO_BITMAP *discard_pile;
+  ALLEGRO_BITMAP *deck_pile;
+  
   ALLEGRO_FONT* font;
 
 } Renderer;
