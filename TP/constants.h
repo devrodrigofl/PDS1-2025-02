@@ -22,7 +22,7 @@
 #define PLAYER_RADIUS 60
 
 #define HEALTH_BAR_WIDTH 270
-#define HEALTH_BAR_HEIGHT 64 //48
+#define HEALTH_BAR_HEIGHT 64
 #define HEALTH_BAR_BACKGROUND_EXTRA 1
 
 #define HEALTH_BAR_RX 0
@@ -44,6 +44,9 @@
 #define ENEMY_HEIGHT 270
 
 #define ENEMY_HEALTH_BAR 200
+
+#define ENERGY_WIDTH 220
+#define ENERGY_HEIGHT 220
 
 // You might want to use this.
 typedef enum {

@@ -85,6 +85,11 @@ void FillRenderer(Renderer* renderer) {
       al_load_bitmap("assets/health_bar.png");
   must_init(renderer->health_bar, "health_bar");
 
+  //load the energy
+  renderer->energy_indicator = 
+      al_load_bitmap("assets/energy.png");
+  must_init(renderer->energy_indicator, "energy");
+
   renderer->font = al_create_builtin_font();
   must_init(renderer->font, "font");
 }
@@ -109,6 +114,14 @@ void RenderBackground(Renderer* renderer) {
         al_get_bitmap_height(renderer->background_3), 0, 0, DISPLAY_BUFFER_WIDTH, DISPLAY_BUFFER_HEIGHT, 0);
   }
 
+  // Background 4
+  if (renderer->background_4) {
+      al_draw_scaled_bitmap(renderer->background_4, 0, 0, al_get_bitmap_width(renderer->background_4), 
+        al_get_bitmap_height(renderer->background_4), 0, 0, DISPLAY_BUFFER_WIDTH, DISPLAY_BUFFER_HEIGHT, 0);
+  }
+}
+
+void RenderBackground2(Renderer* renderer) {
   // Background 4
   if (renderer->background_4) {
       al_draw_scaled_bitmap(renderer->background_4, 0, 0, al_get_bitmap_width(renderer->background_4), 
@@ -183,21 +196,21 @@ void RenderCreature(Renderer* renderer, int begin_x, int mid_y, int width) {
   }
 }
 
-void RenderCard(const Renderer* renderer, int x_left, int y_top, type_of_card type, int effect) {
+void RenderCard(const Renderer* renderer, int x_left, int y_top, type_of_card type, int effect, int energy_cost) {
   ALLEGRO_BITMAP* card_bitmap = al_create_bitmap(CARD_WIDTH, CARD_HEIGHT);
   al_set_target_bitmap(card_bitmap);
   
   float xscale = 1, yscale = 1;
   ALLEGRO_COLOR color = al_map_rgb(0, 0, 0);
 
-  char text[50] = "";
+  char text[100] = "";
   xscale = 1.05, yscale = 1.3;
 
   if (renderer->card_attack && type == attack) {
       al_draw_scaled_bitmap(renderer->card_attack, 0, 0, al_get_bitmap_width(renderer->card_attack), 
         al_get_bitmap_height(renderer->card_attack), 0, 0, CARD_WIDTH, CARD_HEIGHT, 0);
 
-      sprintf(text, "Attack:\n\n\n\n\n%d of damage!\n", effect);
+      sprintf(text, "Attack:\n\n\nEffect:\n%d of damage!\n\nCost:\n%d of energy!", effect, energy_cost);
       DrawScaledText(renderer->font, color, (CARD_WIDTH * 0.14) / xscale, (CARD_HEIGHT * 0.07) / yscale, xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
   }
 
@@ -205,7 +218,7 @@ void RenderCard(const Renderer* renderer, int x_left, int y_top, type_of_card ty
       al_draw_scaled_bitmap(renderer->card_defense, 0, 0, al_get_bitmap_width(renderer->card_defense), 
         al_get_bitmap_height(renderer->card_defense), 0, 0, CARD_WIDTH, CARD_HEIGHT, 0);
 
-      sprintf(text, "Defense:\n\n\n\n\n+%d of shield!\n", effect);
+      sprintf(text, "Defense:\n\n\nEffect:\n%d of shield!\n\nCost:\n%d of energy!", effect, energy_cost);
       DrawScaledText(renderer->font, color, (CARD_WIDTH * 0.14) / xscale, (CARD_HEIGHT * 0.07) / yscale, xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
   }
 
@@ -213,7 +226,7 @@ void RenderCard(const Renderer* renderer, int x_left, int y_top, type_of_card ty
       al_draw_scaled_bitmap(renderer->card_especial, 0, 0, al_get_bitmap_width(renderer->card_especial), 
         al_get_bitmap_height(renderer->card_especial), 0, 0, CARD_WIDTH, CARD_HEIGHT, 0);
 
-      sprintf(text, "Especial:\n\n\n\n\nnew hand!\n");
+      sprintf(text, "Especial:\n\n\nEffect:\nnew hand!");
       DrawScaledText(renderer->font, color, (CARD_WIDTH * 0.14) / xscale, (CARD_HEIGHT * 0.07) / yscale, xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
   }
 
@@ -226,12 +239,12 @@ void RenderPlayerHand(Renderer* renderer) {
   int space = 0;
   for(int i = 0; i < renderer->manager->player->hand.deck_size; i++) {
     if (renderer->manager->selected_card_index == i)  {
-      RenderCard(renderer, HAND_BEGIN_X + space, HAND_BEGIN_Y - 100, renderer->manager->player->hand.cards[i].type, 
-      renderer->manager->player->hand.cards[i].effect);
+      RenderCard(renderer, HAND_BEGIN_X + space, HAND_BEGIN_Y - 120, renderer->manager->player->hand.cards[i].type, 
+      renderer->manager->player->hand.cards[i].effect, renderer->manager->player->hand.cards[i].energy_cost);
     }
     else {
     RenderCard(renderer, HAND_BEGIN_X + space, HAND_BEGIN_Y, renderer->manager->player->hand.cards[i].type, 
-      renderer->manager->player->hand.cards[i].effect);
+      renderer->manager->player->hand.cards[i].effect, renderer->manager->player->hand.cards[i].energy_cost);
     }
     space += 108;
   }
@@ -282,15 +295,27 @@ void RenderEnemies(Renderer* renderer) {
   }
 }
 
-void RenderEnergy(Renderer* renderer) {}
+void RenderEnergy(Renderer* renderer) {
+
+  al_draw_scaled_bitmap(renderer->energy_indicator, 0, 0, al_get_bitmap_width(renderer->energy_indicator), 
+    al_get_bitmap_height(renderer->energy_indicator), 148, 410, ENERGY_WIDTH, ENERGY_HEIGHT, 0);
+
+  char text[50] = "";
+  int xscale = 2, yscale = 2;
+
+  sprintf(text, "%d/%d", renderer->manager->player->current_energy, renderer->manager->player->max_energy);
+  DrawScaledText(renderer->font, al_map_rgb(0, 0, 0), 10 + (ENERGY_WIDTH / 2), 150 + (ENERGY_HEIGHT / 2), xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
+
+}
 
 void Render(Renderer* renderer) {
   al_set_target_bitmap(renderer->display_buffer);
   RenderBackground(renderer);
-  RenderDeck(renderer, DRAW_DECK_X, DRAW_DECK_Y);
+  //RenderDeck(renderer, DRAW_DECK_X, DRAW_DECK_Y);
   RenderCreature(renderer, PLAYER_BEGIN_X, PLAYER_BEGIN_Y + PLAYER_RADIUS, PLAYER_RADIUS);
   RenderEnergy(renderer);
   RenderEnemies(renderer);
+  RenderBackground2(renderer);
   RenderPlayerHand(renderer);
   al_set_target_backbuffer(renderer->display);
 
