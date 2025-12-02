@@ -53,6 +53,9 @@ void startCombat(CombatManager* manager, Player* player, EnemyGroup* enemies) {
     manager->enemies = enemies;
     manager->input_mode = INPUT_SELECT_CARD;
 
+    manager->selected_card_index = 0;
+    manager->selected_target_index = 0;
+
     startPlayerTurn(manager);
 }
 
@@ -160,7 +163,7 @@ void moveCursor(CombatManager* manager, CursorMovementDirection direction){
 void combatHandleInput(CombatManager* manager, unsigned char* keys) {
     //check if it's the player's turn
     if (manager->state != player_turn) return;
-
+    
     if (isKeyPressed(keys, ALLEGRO_KEY_LEFT)) {
         moveCursor(manager, MOVE_LEFT);
     }
@@ -169,10 +172,10 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
     }
 
     if (isKeyPressed(keys, ALLEGRO_KEY_ENTER)) {
-        
+
         //choosing card
         if (manager->input_mode == INPUT_SELECT_CARD) {
-            
+
             // empty hand
             if (manager->player->hand.deck_size == 0) return;
             printf("%d\n", manager->selected_card_index);
@@ -189,6 +192,7 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
                     manager->selected_target_index = 0;
                     printf("Selecione o alvo\n");
                 } 
+
                 //defense and especial execute action
                 else {
                     // remove energy

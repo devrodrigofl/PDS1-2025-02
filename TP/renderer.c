@@ -68,40 +68,18 @@ void FillRenderer(Renderer* renderer) {
   must_init(renderer->card_especial, "card_especial");
   
   //load the strong_enemy_idle
-  renderer->strong_enemy_idle[1] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0001.png");
-  renderer->strong_enemy_idle[2] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0002.png");
-  renderer->strong_enemy_idle[3] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0003.png");
-  renderer->strong_enemy_idle[4] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0004.png");
-  renderer->strong_enemy_idle[5] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0005.png");
-  renderer->strong_enemy_idle[6] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0006.png");
-  renderer->strong_enemy_idle[7] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0007.png");
-  renderer->strong_enemy_idle[8] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0008.png");
-  renderer->strong_enemy_idle[9] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0009.png");
-  renderer->strong_enemy_idle[10] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0010.png");
-  renderer->strong_enemy_idle[11] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0011.png");
-  renderer->strong_enemy_idle[12] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0012.png");
-  renderer->strong_enemy_idle[13] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0013.png");
-  renderer->strong_enemy_idle[14] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0014.png");
-  renderer->strong_enemy_idle[15] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0015.png");
-  renderer->strong_enemy_idle[16] = 
-      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0016.png");
-  must_init(renderer->strong_enemy_idle, "strong_enemy_idle");
-  
+  for (int i = 0; i < 16; i++) {
+        char filename[50];
+
+        if(i < 9) {
+          sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_000%d.png", i + 1); 
+        }
+        else sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_00%d.png", i + 1);
+        
+        renderer->strong_enemy_idle[i] = al_load_bitmap(filename);
+        must_init(renderer->strong_enemy_idle[i], filename);
+    }
+
   renderer->font = al_create_builtin_font();
   must_init(renderer->font, "font");
 }
@@ -243,14 +221,20 @@ void RenderEnemy(Renderer* renderer, int x_left, int y_top, EnemyType type) {
   ALLEGRO_BITMAP* enemy_bitmap = al_create_bitmap(ENEMY_WIDTH, ENEMY_HEIGHT);
   al_set_target_bitmap(enemy_bitmap);
 
+  int frame = (int)(al_get_time() * 16) % 16;
+
   if (type == strong) {
-      al_draw_scaled_bitmap(renderer->strong_enemy_idle, 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle), 
-        al_get_bitmap_height(renderer->strong_enemy_idle), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+    for(int i = 0; i < 16; i++) {
+      al_draw_scaled_bitmap(renderer->strong_enemy_idle[frame], 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle[frame]), 
+        al_get_bitmap_height(renderer->strong_enemy_idle[frame]), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+    }
   }
 
   if (type == weak) {
-      al_draw_scaled_bitmap(renderer->strong_enemy_idle, 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle), 
-        al_get_bitmap_height(renderer->strong_enemy_idle), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+    for(int i = 0; i < 16; i++) {
+      al_draw_scaled_bitmap(renderer->strong_enemy_idle[frame], 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle[frame]), 
+        al_get_bitmap_height(renderer->strong_enemy_idle[frame]), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+    }
   }
 
   al_set_target_bitmap(renderer->display_buffer);
@@ -303,4 +287,21 @@ void ClearRenderer(Renderer* renderer) {
   al_destroy_bitmap(renderer->background_2);
   al_destroy_bitmap(renderer->background_3);
   al_destroy_bitmap(renderer->background_4);
+
+  //clear the card images
+  al_destroy_bitmap(renderer->card_attack);
+  al_destroy_bitmap(renderer->card_defense);
+  al_destroy_bitmap(renderer->card_especial);
+  
+  //clear the strong_enemy_idle
+  for (int i = 0; i < 16; i++) {
+        char filename[50];
+
+        if(i < 9) {
+          sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_000%d.png", i + 1); 
+        }
+        else sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_00%d.png", i + 1);
+        
+        al_destroy_bitmap(renderer->strong_enemy_idle[i]);
+    }
 }
