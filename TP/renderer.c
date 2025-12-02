@@ -69,16 +69,21 @@ void FillRenderer(Renderer* renderer) {
   
   //load the strong_enemy_idle
   for (int i = 0; i < 16; i++) {
-        char filename[50];
+    char filename[50];
 
-        if(i < 9) {
-          sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_000%d.png", i + 1); 
-        }
-        else sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_00%d.png", i + 1);
+      if(i < 9) {
+        sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_000%d.png", i + 1); 
+      }
+      else sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_00%d.png", i + 1);
         
-        renderer->strong_enemy_idle[i] = al_load_bitmap(filename);
-        must_init(renderer->strong_enemy_idle[i], filename);
-    }
+      renderer->strong_enemy_idle[i] = al_load_bitmap(filename);
+      must_init(renderer->strong_enemy_idle[i], filename);
+  }
+
+  //load the health bar
+  renderer->health_bar = 
+      al_load_bitmap("assets/health_bar.png");
+  must_init(renderer->health_bar, "health_bar");
 
   renderer->font = al_create_builtin_font();
   must_init(renderer->font, "font");
@@ -124,24 +129,39 @@ void RenderDeck(Renderer* renderer, int x_left, int y_top) {
   al_destroy_bitmap(deck_bitmap);
 }
 
-void RenderHealthBar(float x_begin, float x_end, float y_down_left, ALLEGRO_FONT* font) {
-  float mid_y = y_down_left - (HEALTH_BAR_HEIGHT * 0.78);
+void RenderHealthBar(Renderer* renderer, Status status, int x_left, int y_top, ALLEGRO_FONT* font) {
 
-  al_draw_filled_rounded_rectangle(x_begin - HEALTH_BAR_BACKGROUND_EXTRA, y_down_left - HEALTH_BAR_BACKGROUND_EXTRA, x_end + HEALTH_BAR_BACKGROUND_EXTRA, 
-    y_down_left - HEALTH_BAR_HEIGHT + HEALTH_BAR_BACKGROUND_EXTRA, HEALTH_BAR_RX, HEALTH_BAR_RY, al_map_rgb(255, 255, 255));
+  al_draw_scaled_bitmap(renderer->health_bar, 0, 0, al_get_bitmap_width(renderer->health_bar), 
+    al_get_bitmap_height(renderer->health_bar), x_left, y_top, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, 0);
 
-  char text[100] = "";
-  sprintf(text, "Vida?");
-  float x_scale = 2.0, y_scale = 2.0;
-  DrawScaledText(font, al_map_rgb(0, 0, 0), (x_begin + x_end) / 2.0 / x_scale, mid_y / y_scale, x_scale, y_scale, ALLEGRO_ALIGN_CENTRE, text);
+  float percent = (float)status.current_hp / (float)status.max_hp;
+  if (percent < 0) percent = 0;
+  if (percent > 1) percent = 1;
+
+  float bar_start_x = x_left + 59;
+  float bar_start_y = y_top + 27;
+  float max_width = 148.0;
+  float bar_height = 32;
+  float bar_end_x = bar_start_x + (max_width * percent);
+
+  al_draw_filled_rounded_rectangle(bar_start_x, bar_start_y, bar_end_x, y_top + bar_height, 0, 0, al_map_rgb(200, 0, 0));
+    
+  char text[50];
+  sprintf(text, "%d / %d", status.current_hp, status.max_hp); 
+    
+  float text_x = x_left + (HEALTH_BAR_WIDTH / 2.0);
+  float text_y = y_top + (HEALTH_BAR_HEIGHT / 2.0) - 5;
+
+  DrawScaledText(font, al_map_rgb(255, 255, 255), text_x, text_y, 1.0, 1.0, ALLEGRO_ALIGN_CENTRE, text);
+
 }
 
-void RenderCreature(const Renderer* renderer, int begin_x, int mid_y, int width) {
+void RenderCreature(Renderer* renderer, int begin_x, int mid_y, int width) {
   al_draw_filled_circle(begin_x + width / 2.0, mid_y, width, al_map_rgb(255, 255, 255));
   float x_end = begin_x + width;
 
   float health_bar_y = mid_y + width + 20;
-  RenderHealthBar(begin_x, x_end, health_bar_y, renderer->font);
+  //RenderHealthBar(renderer, 220, 200 + 60, renderer->font);
 
   float xscale = 1, yscale = 1;
 
@@ -250,9 +270,11 @@ void RenderEnemies(Renderer* renderer) {
 
       if(renderer->manager->input_mode == INPUT_SELECT_TARGET && renderer->manager->selected_target_index == i){
         RenderEnemy(renderer, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + space, renderer->manager->enemies->enemy[i].type);
+        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
       }
       else {
         RenderEnemy(renderer, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + space, renderer->manager->enemies->enemy[i].type);
+        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
       }
     }
 
@@ -301,7 +323,7 @@ void ClearRenderer(Renderer* renderer) {
           sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_000%d.png", i + 1); 
         }
         else sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_00%d.png", i + 1);
-        
+
         al_destroy_bitmap(renderer->strong_enemy_idle[i]);
     }
 }
