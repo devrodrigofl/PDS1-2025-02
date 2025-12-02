@@ -37,7 +37,7 @@ int main() {
   FillRenderer(&renderer);
   al_register_event_source(queue, al_get_display_event_source(renderer.display));
   
-  // 3. INICIALIZAÇÃO DO JOGO
+  //INICIALIZAÇÃO DO JOGO
     printf("=== INICIANDO O JOGO ===\n");
 
     Player player;

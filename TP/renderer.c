@@ -57,16 +57,51 @@ void FillRenderer(Renderer* renderer) {
   //load the card images
   renderer->card_attack = 
       al_load_bitmap("assets/card_attack.png");
-  must_init(renderer->font, "card_attack");
+  must_init(renderer->card_attack, "card_attack");
 
   renderer->card_defense = 
       al_load_bitmap("assets/card_defense.png");
-  must_init(renderer->font, "card_defense");
+  must_init(renderer->card_defense, "card_defense");
 
   renderer->card_especial = 
       al_load_bitmap("assets/card_especial.png");
-  must_init(renderer->font, "card_especial");
-
+  must_init(renderer->card_especial, "card_especial");
+  
+  //load the strong_enemy_idle
+  renderer->strong_enemy_idle[1] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0001.png");
+  renderer->strong_enemy_idle[2] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0002.png");
+  renderer->strong_enemy_idle[3] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0003.png");
+  renderer->strong_enemy_idle[4] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0004.png");
+  renderer->strong_enemy_idle[5] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0005.png");
+  renderer->strong_enemy_idle[6] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0006.png");
+  renderer->strong_enemy_idle[7] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0007.png");
+  renderer->strong_enemy_idle[8] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0008.png");
+  renderer->strong_enemy_idle[9] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0009.png");
+  renderer->strong_enemy_idle[10] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0010.png");
+  renderer->strong_enemy_idle[11] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0011.png");
+  renderer->strong_enemy_idle[12] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0012.png");
+  renderer->strong_enemy_idle[13] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0013.png");
+  renderer->strong_enemy_idle[14] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0014.png");
+  renderer->strong_enemy_idle[15] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0015.png");
+  renderer->strong_enemy_idle[16] = 
+      al_load_bitmap("assets/strong_enemy_idle/Idle_Body_270_0016.png");
+  must_init(renderer->strong_enemy_idle, "strong_enemy_idle");
+  
   renderer->font = al_create_builtin_font();
   must_init(renderer->font, "font");
 }
@@ -204,7 +239,42 @@ void RenderPlayerHand(Renderer* renderer) {
   }
 }
 
-void RenderEnemies(Renderer* renderer) {}
+void RenderEnemy(Renderer* renderer, int x_left, int y_top, EnemyType type) {
+  ALLEGRO_BITMAP* enemy_bitmap = al_create_bitmap(ENEMY_WIDTH, ENEMY_HEIGHT);
+  al_set_target_bitmap(enemy_bitmap);
+
+  if (type == strong) {
+      al_draw_scaled_bitmap(renderer->strong_enemy_idle, 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle), 
+        al_get_bitmap_height(renderer->strong_enemy_idle), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+  }
+
+  if (type == weak) {
+      al_draw_scaled_bitmap(renderer->strong_enemy_idle, 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle), 
+        al_get_bitmap_height(renderer->strong_enemy_idle), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+  }
+
+  al_set_target_bitmap(renderer->display_buffer);
+  al_draw_scaled_bitmap(enemy_bitmap, 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, x_left, y_top, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+  al_destroy_bitmap(enemy_bitmap);
+}
+
+void RenderEnemies(Renderer* renderer) {
+  int space = 0;
+  for(int i = 0; i < renderer->manager->enemies->count; i ++) {
+
+    if(renderer->manager->enemies->enemy[i].status.current_hp > 0) {
+
+      if(renderer->manager->input_mode == INPUT_SELECT_TARGET && renderer->manager->selected_target_index == i){
+        RenderEnemy(renderer, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + space, renderer->manager->enemies->enemy[i].type);
+      }
+      else {
+        RenderEnemy(renderer, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + space, renderer->manager->enemies->enemy[i].type);
+      }
+    }
+
+    space += 180;
+  }
+}
 
 void RenderEnergy(Renderer* renderer) {}
 

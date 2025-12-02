@@ -36,6 +36,12 @@
 #define CARD_WIDTH 156
 #define CARD_HEIGHT 211.5
 
+#define ENEMY_BEGIN_X 856
+#define ENEMY_BEGIN_Y 105
+
+#define ENEMY_WIDTH 270
+#define ENEMY_HEIGHT 270
+
 // You might want to use this.
 typedef enum {
   MOVE_LEFT = 0,

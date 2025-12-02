@@ -210,7 +210,7 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
         }
         
         //choosing enemy
-        if (manager->input_mode == INPUT_SELECT_TARGET) {
+        else if (manager->input_mode == INPUT_SELECT_TARGET) {
             
             Enemy* target = &manager->enemies->enemy[manager->selected_target_index];
 

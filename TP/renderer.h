@@ -23,6 +23,8 @@ typedef struct {
   ALLEGRO_BITMAP *card_defense;
   ALLEGRO_BITMAP *card_especial;
 
+  ALLEGRO_BITMAP *strong_enemy_idle[16];
+
   ALLEGRO_FONT* font;
 
 } Renderer;
