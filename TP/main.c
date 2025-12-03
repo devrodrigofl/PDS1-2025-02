@@ -53,9 +53,9 @@ int main() {
     printf("> Combate Iniciado! Turno do Jogador.\n");
     printf("========================\n\n");
 
-    int current_round = 1;
+    combat_manager.current_round = 0;
     
-    printf(">>> INICIO DO ROUND %d/%d <<<\n", current_round, TOTAL_ROUNDS);
+    printf(">>> INICIO DO ROUND %d/%d <<<\n", combat_manager.current_round, TOTAL_ROUNDS);
 
     renderer.manager = &combat_manager;
     int victory_timer = 0;
@@ -88,11 +88,11 @@ int main() {
 
             if (keyboard_keys[ALLEGRO_KEY_ENTER] & GAME_KEY_SEEN) {
               
-              if (current_round < TOTAL_ROUNDS) {
-                printf("\n=== VITORIA NO ROUND %d! ===\n", current_round);
+              if (combat_manager.current_round < TOTAL_ROUNDS) {
+                printf("\n=== VITORIA NO ROUND %d! ===\n", combat_manager.current_round);
                 printf("Preparando proximo combate...\n");
                     
-                current_round++;
+                combat_manager.current_round++;
     
                 discardAllCards(&player.hand, &player.deck);
                 discardAllCards(&player.discard_pile, &player.deck);
@@ -100,7 +100,7 @@ int main() {
                 buildEnemyGroup(&enemies);
                 startCombat(&combat_manager, &player, &enemies);
     
-                printf(">>> INICIO DO ROUND %d/%d <<<\n", current_round, TOTAL_ROUNDS);
+                printf(">>> INICIO DO ROUND %d/%d <<<\n", combat_manager.current_round, TOTAL_ROUNDS);
     
               } else {
                 printf("\n=================================\n");
@@ -112,7 +112,7 @@ int main() {
             else if (combat_manager.state == defeat) {
               printf("\n=================================\n");
               printf("      GAME OVER - Voce Morreu      \n");
-              printf("      Chegou ate o Round %d/%d     \n", current_round, TOTAL_ROUNDS);
+              printf("      Chegou ate o Round %d/%d     \n", combat_manager.current_round, TOTAL_ROUNDS);
               printf("=================================\n");
               done = 1;
             }

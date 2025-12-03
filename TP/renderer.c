@@ -25,6 +25,36 @@ void DrawCenteredScaledText(ALLEGRO_FONT* font, ALLEGRO_COLOR color, float x, fl
   DrawScaledText(font, color, x, y, xscale, yscale, ALLEGRO_ALIGN_CENTRE, text);
 }
 
+void DrawVerticalGradient(float x, float y, float w, float h, ALLEGRO_COLOR top_color, ALLEGRO_COLOR bottom_color) {
+    ALLEGRO_VERTEX v[4];
+
+    // upper left
+    v[0].x = x;     
+    v[0].y = y;     
+    v[0].z = 0; 
+    v[0].color = top_color;
+
+    // upper right
+    v[1].x = x + w; 
+    v[1].y = y;     
+    v[1].z = 0; 
+    v[1].color = top_color;
+
+    // bottom right
+    v[2].x = x + w; 
+    v[2].y = y + h; 
+    v[2].z = 0; 
+    v[2].color = bottom_color;
+
+    // bottom left
+    v[3].x = x;     
+    v[3].y = y + h; 
+    v[3].z = 0; 
+    v[3].color = bottom_color;
+
+    al_draw_prim(v, NULL, NULL, 0, 4, ALLEGRO_PRIM_TRIANGLE_FAN);
+}
+
 void FillRenderer(Renderer* renderer) {
   al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST);
   al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
@@ -408,6 +438,24 @@ void RenderDefeatScreen(Renderer* renderer) {
   DrawCenteredScaledText(renderer->font, al_map_rgb(200, 200, 200), center_x / small_scale, (center_y + 100) / small_scale, small_scale, small_scale, "Pressione Q para sair");
 }
 
+void RenderFloorHeader(Renderer* renderer) {
+    float bar_height = 40;
+    //al_draw_filled_rectangle(0, 0, DISPLAY_BUFFER_WIDTH, bar_height, al_map_rgba(0, 0, 0, 0));
+
+    ALLEGRO_COLOR top_color = al_map_rgb(215, 185, 140);
+    ALLEGRO_COLOR bottom_color = al_map_rgba(0, 0, 0, 0);
+    ALLEGRO_COLOR black_color = al_map_rgb(0, 0, 0);
+    ALLEGRO_COLOR gold_color = al_map_rgb(255, 215, 0);
+
+    DrawVerticalGradient(0, 0, DISPLAY_BUFFER_WIDTH, bar_height, top_color, bottom_color);
+    char text[50];
+    sprintf(text, "FLOOR %d / %d", renderer->manager->current_round, TOTAL_ROUNDS);
+
+    float center_x = DISPLAY_BUFFER_WIDTH / 2.0;
+    
+    DrawScaledText(renderer->font, black_color, center_x / 2.0, 10 / 2.0, 2.0, 2.0, ALLEGRO_ALIGN_CENTRE, text);
+}
+
 void Render(Renderer* renderer) {
   al_set_target_bitmap(renderer->display_buffer);
   RenderBackground(renderer);
@@ -417,6 +465,7 @@ void Render(Renderer* renderer) {
   //RenderBackground2(renderer);
   RenderDeck(renderer);
   RenderPlayerHand(renderer);
+  RenderFloorHeader(renderer);
 
   if (renderer->manager) {
     if (renderer->manager->state == victory) {

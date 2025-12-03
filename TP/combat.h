@@ -25,6 +25,7 @@ typedef struct {
     InputState input_mode;  
     int selected_card_index;
     int selected_target_index;
+    int current_round;
 } CombatManager;
 
 void addShield(Status* status, int effect);
