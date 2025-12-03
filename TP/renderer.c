@@ -265,13 +265,15 @@ void RenderCreature(Renderer* renderer, int x_left, int y_top) {
 
   int frame = (int)(al_get_time() * 4) % 12;
 
-  for(int i = 0; i < 12; i++) {
-    al_draw_scaled_bitmap(renderer->player_idle[frame], 0, 0, al_get_bitmap_width(renderer->player_idle[frame]), 
-      al_get_bitmap_height(renderer->player_idle[frame]), 0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
-  }
+  al_draw_scaled_bitmap(renderer->player_idle[frame], 0, 0, al_get_bitmap_width(renderer->player_idle[frame]), 
+    al_get_bitmap_height(renderer->player_idle[frame]), 0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
 
   al_set_target_bitmap(renderer->display_buffer);
   al_draw_scaled_bitmap(player_bitmap, 0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, x_left, y_top, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
+
+  RenderHealthBar(renderer, renderer->manager->player->status, health_bar, x_left - 50, y_top + PLAYER_HEIGHT - 24, renderer->font);
+  RenderHealthBar(renderer, renderer->manager->player->status, shield_bar, x_left - 50, y_top + PLAYER_HEIGHT + 1, renderer->font);
+
   al_destroy_bitmap(player_bitmap);
 }
 
@@ -356,17 +358,13 @@ void RenderEnemy(Renderer* renderer, int x_left, int y_top, EnemyType type) {
   int frame = (int)(al_get_time() * 16) % 16;
 
   if (type == strong) {
-    for(int i = 0; i < 16; i++) {
-      al_draw_scaled_bitmap(renderer->strong_enemy_idle[frame], 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle[frame]), 
-        al_get_bitmap_height(renderer->strong_enemy_idle[frame]), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
-    }
+    al_draw_scaled_bitmap(renderer->strong_enemy_idle[frame], 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle[frame]), 
+      al_get_bitmap_height(renderer->strong_enemy_idle[frame]), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
   }
 
   if (type == weak) {
-    for(int i = 0; i < 16; i++) {
-      al_draw_scaled_bitmap(renderer->strong_enemy_idle[frame], 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle[frame]), 
-        al_get_bitmap_height(renderer->strong_enemy_idle[frame]), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
-    }
+    al_draw_scaled_bitmap(renderer->strong_enemy_idle[frame], 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle[frame]), 
+      al_get_bitmap_height(renderer->strong_enemy_idle[frame]), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
   }
 
   al_set_target_bitmap(renderer->display_buffer);
