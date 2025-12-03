@@ -6,6 +6,11 @@
 #include "combat.h"
 #include "entities.h"
 
+typedef enum Asset{
+  health_bar,
+  shield_bar,
+} Asset;
+
 typedef struct {
   //pointer to combat logic
   CombatManager* manager;

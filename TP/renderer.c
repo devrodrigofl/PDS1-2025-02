@@ -159,30 +159,63 @@ void RenderDeck(Renderer* renderer) {
   DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), (DECK_WIDTH / 2) + 498, 226 + (DECK_HEIGHT / 2), xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
 }
 
-void RenderHealthBar(Renderer* renderer, Status status, int x_left, int y_top, ALLEGRO_FONT* font) {
+void RenderHealthBar(Renderer* renderer, Status status, Asset asset, int x_left, int y_top, ALLEGRO_FONT* font) {
 
-  al_draw_scaled_bitmap(renderer->health_bar, 0, 0, al_get_bitmap_width(renderer->health_bar), 
-    al_get_bitmap_height(renderer->health_bar), x_left, y_top, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, 0);
+  if(asset == health_bar) {
+    al_draw_scaled_bitmap(renderer->health_bar, 0, 0, al_get_bitmap_width(renderer->health_bar), 
+      al_get_bitmap_height(renderer->health_bar), x_left, y_top, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, 0);
+  
+    float percent = 0;
+    if (status.max_hp > 0) {
+      percent = (float)status.current_hp / (float)status.max_hp;
+    }
+    if (percent < 0) percent = 0;
+    if (percent > 1) percent = 1;
+  
+    float bar_start_x = x_left + 59;
+    float bar_start_y = y_top + 27;
+    float max_width = 148.0;
+    float bar_height = 32;
+    float bar_end_x = bar_start_x + (max_width * percent);
+  
+    al_draw_filled_rounded_rectangle(bar_start_x, bar_start_y, bar_end_x, y_top + bar_height, 0, 0, al_map_rgb(200, 0, 0));
+      
+    char text[50];
+    sprintf(text, "%d / %d", status.current_hp, status.max_hp); 
+      
+    float text_x = x_left + (HEALTH_BAR_WIDTH / 2.0);
+    float text_y = y_top + (HEALTH_BAR_HEIGHT / 2.0) - 5;
+  
+    DrawScaledText(font, al_map_rgb(255, 255, 255), text_x, text_y, 1.0, 1.0, ALLEGRO_ALIGN_CENTRE, text);   
+  }
 
-  float percent = (float)status.current_hp / (float)status.max_hp;
-  if (percent < 0) percent = 0;
-  if (percent > 1) percent = 1;
-
-  float bar_start_x = x_left + 59;
-  float bar_start_y = y_top + 27;
-  float max_width = 148.0;
-  float bar_height = 32;
-  float bar_end_x = bar_start_x + (max_width * percent);
-
-  al_draw_filled_rounded_rectangle(bar_start_x, bar_start_y, bar_end_x, y_top + bar_height, 0, 0, al_map_rgb(200, 0, 0));
-    
-  char text[50];
-  sprintf(text, "%d / %d", status.current_hp, status.max_hp); 
-    
-  float text_x = x_left + (HEALTH_BAR_WIDTH / 2.0);
-  float text_y = y_top + (HEALTH_BAR_HEIGHT / 2.0) - 5;
-
-  DrawScaledText(font, al_map_rgb(255, 255, 255), text_x, text_y, 1.0, 1.0, ALLEGRO_ALIGN_CENTRE, text);
+  if(asset == shield_bar) {
+    al_draw_scaled_bitmap(renderer->shield_bar, 0, 0, al_get_bitmap_width(renderer->shield_bar), 
+      al_get_bitmap_height(renderer->shield_bar), x_left, y_top, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, 0);
+  
+    float percent = 0;
+    if (status.max_hp > 0) {
+      percent = (float)status.current_shield / (float)status.max_shild;
+    }
+    if (percent < 0) percent = 0;
+    if (percent > 1) percent = 1;
+  
+    float bar_start_x = x_left + 59;
+    float bar_start_y = y_top + 27;
+    float max_width = 148.0;
+    float bar_height = 32;
+    float bar_end_x = bar_start_x + (max_width * percent);
+  
+    al_draw_filled_rounded_rectangle(bar_start_x, bar_start_y, bar_end_x, y_top + bar_height, 0, 0, al_map_rgb(0, 0, 200));
+      
+    char text[50];
+    sprintf(text, "%d / %d", status.current_shield, status.max_shild); 
+      
+    float text_x = x_left + (HEALTH_BAR_WIDTH / 2.0);
+    float text_y = y_top + (HEALTH_BAR_HEIGHT / 2.0) - 5;
+  
+    DrawScaledText(font, al_map_rgb(255, 255, 255), text_x, text_y, 1.0, 1.0, ALLEGRO_ALIGN_CENTRE, text);  
+  }
 
 }
 
@@ -300,11 +333,13 @@ void RenderEnemies(Renderer* renderer) {
 
       if(renderer->manager->input_mode == INPUT_SELECT_TARGET && renderer->manager->selected_target_index == i){
         RenderEnemy(renderer, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + space, renderer->manager->enemies->enemy[i].type);
-        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
+        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, health_bar, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
+        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, shield_bar, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space + 25, renderer->font);
       }
       else {
         RenderEnemy(renderer, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + space, renderer->manager->enemies->enemy[i].type);
-        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
+        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, health_bar, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
+        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, shield_bar, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space + 25, renderer->font);
       }
     }
 
