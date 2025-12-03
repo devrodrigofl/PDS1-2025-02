@@ -170,19 +170,19 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
     if (isKeyPressed(keys, ALLEGRO_KEY_RIGHT)) {
         moveCursor(manager, MOVE_RIGHT);
     }
-
+    
     if (isKeyPressed(keys, ALLEGRO_KEY_ENTER)) {
-
+        
         //choosing card
         if (manager->input_mode == INPUT_SELECT_CARD) {
-
+            
             // empty hand
             if (manager->player->hand.deck_size == 0) return;
             printf("%d\n", manager->selected_card_index);
             Card* card_selected = &manager->player->hand.cards[manager->selected_card_index];
-
+            
             type_of_card played_card_type = card_selected->type;
-
+            
             // check for suficient energy
             if (manager->player->current_energy >= card_selected->energy_cost) {
                 
@@ -192,19 +192,19 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
                     manager->selected_target_index = 0;
                     printf("Selecione o alvo\n");
                 } 
-
+                
                 //defense and especial execute action
                 else {
                     // remove energy
                     manager->player->current_energy -= card_selected->energy_cost;
-
+                    
                     executeAction(manager, &manager->player->status, &manager->player->status, played_card_type, card_selected->effect);
-
+                    
                     // throw card in discard pile
                     if (played_card_type != especial) {
                         playedCard(&manager->player->hand, manager->selected_card_index, &manager->player->discard_pile);
                     }
-
+                    
                     if (manager->selected_card_index >= manager->player->hand.deck_size) {
                         manager->selected_card_index = manager->player->hand.deck_size - 1;
                         if (manager->selected_card_index < 0) manager->selected_card_index = 0;
@@ -217,7 +217,7 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
         else if (manager->input_mode == INPUT_SELECT_TARGET) {
             
             Enemy* target = &manager->enemies->enemy[manager->selected_target_index];
-
+            
             if (target->status.current_hp > 0) {
                 
                 Card* card_selected = &manager->player->hand.cards[manager->selected_card_index];
@@ -226,12 +226,12 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
                 manager->player->current_energy -= card_selected->energy_cost;
                 
                 printf("Ataque realizado! Dano: %d\n", card_selected->effect);
-
+                
                 executeAction(manager, &manager->player->status, &target->status, card_selected->type, card_selected->effect);
                 
                 // throw card in discard pile
                 playedCard(&manager->player->hand, manager->selected_card_index, &manager->player->discard_pile);
-
+                
                 manager->input_mode = INPUT_SELECT_CARD;
                 
                 if (manager->selected_card_index >= manager->player->hand.deck_size) {
@@ -242,6 +242,14 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
                 printf("target invalido (ja morreu)!\n");
             }
         }
+    }
+    
+    if (isKeyPressed(keys, ALLEGRO_KEY_SPACE)) {
+    
+    manager->state = victory;
+    
+    printf("CHEAT: Vitoria Instantanea ativada com ESPACO!\n");
+    
     }
 
     if (isKeyPressed(keys, ALLEGRO_KEY_ESCAPE)) {

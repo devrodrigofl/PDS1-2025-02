@@ -53,6 +53,10 @@ int main() {
     printf("> Combate Iniciado! Turno do Jogador.\n");
     printf("========================\n\n");
 
+    int current_round = 1;
+    
+    printf(">>> INICIO DO ROUND %d/%d <<<\n", current_round, TOTAL_ROUNDS);
+
 
     renderer.manager = &combat_manager;
 
@@ -71,8 +75,46 @@ int main() {
 
         combatHandleInput(&combat_manager, keyboard_keys);
         combatUpdate(&combat_manager);
-
-        if (combat_manager.state == victory || combat_manager.state == defeat);
+        
+        if (keyboard_keys[ALLEGRO_KEY_SPACE]) {
+          renderer.manager->state = victory;
+        }
+        
+        if (combat_manager.state == victory) {
+          
+          if (keyboard_keys[ALLEGRO_KEY_ENTER] & GAME_KEY_SEEN) {
+            
+            if (current_round < TOTAL_ROUNDS) {
+              printf("\n=== VITORIA NO ROUND %d! ===\n", current_round);
+              printf("Preparando proximo combate...\n");
+                  
+              current_round++;
+  
+              discardAllCards(&player.hand, &player.deck);
+              discardAllCards(&player.discard_pile, &player.deck);
+              ShuffleDeck(&player.deck);
+              buildEnemyGroup(&enemies);
+              startCombat(&combat_manager, &player, &enemies);
+  
+              printf(">>> INICIO DO ROUND %d/%d <<<\n", current_round, TOTAL_ROUNDS);
+  
+            } else {
+              printf("\n=================================\n");
+              printf("   PARABENS! VOCE COMPLETOU A TORRE!   \n");
+              printf("=================================\n");
+              done = 1;
+            }
+          }
+          else if (combat_manager.state == defeat) {
+            printf("\n=================================\n");
+            printf("      GAME OVER - Voce Morreu      \n");
+            printf("      Chegou ate o Round %d/%d     \n", current_round, TOTAL_ROUNDS);
+            printf("=================================\n");
+            done = 1;
+          }
+            
+          keyboard_keys[ALLEGRO_KEY_ENTER] &= ~GAME_KEY_SEEN;
+        }
 
         for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
           keyboard_keys[i] &= ~GAME_KEY_SEEN;
@@ -92,8 +134,7 @@ int main() {
     if (done) {
       break;
     }
-    // You want to put your combat logic here.
-    
+
     if (redraw) {
       Render(&renderer);
       redraw = 0;
