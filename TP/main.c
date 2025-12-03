@@ -57,8 +57,8 @@ int main() {
     
     printf(">>> INICIO DO ROUND %d/%d <<<\n", current_round, TOTAL_ROUNDS);
 
-
     renderer.manager = &combat_manager;
+    int victory_timer = 0;
 
   al_start_timer(timer);  
   while (1) {
@@ -81,36 +81,41 @@ int main() {
         }
         
         if (combat_manager.state == victory) {
+
+          victory_timer++;
           
-          if (keyboard_keys[ALLEGRO_KEY_ENTER] & GAME_KEY_SEEN) {
-            
-            if (current_round < TOTAL_ROUNDS) {
-              printf("\n=== VITORIA NO ROUND %d! ===\n", current_round);
-              printf("Preparando proximo combate...\n");
-                  
-              current_round++;
-  
-              discardAllCards(&player.hand, &player.deck);
-              discardAllCards(&player.discard_pile, &player.deck);
-              ShuffleDeck(&player.deck);
-              buildEnemyGroup(&enemies);
-              startCombat(&combat_manager, &player, &enemies);
-  
-              printf(">>> INICIO DO ROUND %d/%d <<<\n", current_round, TOTAL_ROUNDS);
-  
-            } else {
+          if (victory_timer > 30) {
+
+            if (keyboard_keys[ALLEGRO_KEY_ENTER] & GAME_KEY_SEEN) {
+              
+              if (current_round < TOTAL_ROUNDS) {
+                printf("\n=== VITORIA NO ROUND %d! ===\n", current_round);
+                printf("Preparando proximo combate...\n");
+                    
+                current_round++;
+    
+                discardAllCards(&player.hand, &player.deck);
+                discardAllCards(&player.discard_pile, &player.deck);
+                ShuffleDeck(&player.deck);
+                buildEnemyGroup(&enemies);
+                startCombat(&combat_manager, &player, &enemies);
+    
+                printf(">>> INICIO DO ROUND %d/%d <<<\n", current_round, TOTAL_ROUNDS);
+    
+              } else {
+                printf("\n=================================\n");
+                printf("   PARABENS! VOCE COMPLETOU A TORRE!   \n");
+                printf("=================================\n");
+                done = 1;
+              }
+            }
+            else if (combat_manager.state == defeat) {
               printf("\n=================================\n");
-              printf("   PARABENS! VOCE COMPLETOU A TORRE!   \n");
+              printf("      GAME OVER - Voce Morreu      \n");
+              printf("      Chegou ate o Round %d/%d     \n", current_round, TOTAL_ROUNDS);
               printf("=================================\n");
               done = 1;
             }
-          }
-          else if (combat_manager.state == defeat) {
-            printf("\n=================================\n");
-            printf("      GAME OVER - Voce Morreu      \n");
-            printf("      Chegou ate o Round %d/%d     \n", current_round, TOTAL_ROUNDS);
-            printf("=================================\n");
-            done = 1;
           }
             
           keyboard_keys[ALLEGRO_KEY_ENTER] &= ~GAME_KEY_SEEN;
