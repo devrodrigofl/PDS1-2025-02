@@ -54,7 +54,7 @@ int main() {
     printf("========================\n\n");
 
     combat_manager.current_round = 0;
-    
+
     printf(">>> INICIO DO ROUND %d/%d <<<\n", combat_manager.current_round, TOTAL_ROUNDS);
 
     renderer.manager = &combat_manager;
@@ -99,6 +99,8 @@ int main() {
                 ShuffleDeck(&player.deck);
                 buildEnemyGroup(&enemies);
                 startCombat(&combat_manager, &player, &enemies);
+
+                victory_timer = 0;
     
                 printf(">>> INICIO DO ROUND %d/%d <<<\n", combat_manager.current_round, TOTAL_ROUNDS);
     
@@ -119,7 +121,8 @@ int main() {
           }
             
           keyboard_keys[ALLEGRO_KEY_ENTER] &= ~GAME_KEY_SEEN;
-        }
+          
+        } else victory_timer = 0;
 
         for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
           keyboard_keys[i] &= ~GAME_KEY_SEEN;
