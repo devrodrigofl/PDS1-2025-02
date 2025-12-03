@@ -19,7 +19,9 @@
 
 #define PLAYER_BEGIN_X 220
 #define PLAYER_BEGIN_Y 200
-#define PLAYER_RADIUS 60
+
+#define PLAYER_WIDTH 170
+#define PLAYER_HEIGHT 220
 
 #define HEALTH_BAR_WIDTH 270
 #define HEALTH_BAR_HEIGHT 64
@@ -47,6 +49,8 @@
 
 #define ENERGY_WIDTH 220
 #define ENERGY_HEIGHT 220
+
+#define TOTAL_ROUNDS 10
 
 // You might want to use this.
 typedef enum {
