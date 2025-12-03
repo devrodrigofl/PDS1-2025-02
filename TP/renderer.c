@@ -67,6 +67,16 @@ void FillRenderer(Renderer* renderer) {
       al_load_bitmap("assets/card_especial.png");
   must_init(renderer->card_especial, "card_especial");
   
+  //load the player_idle
+  for (int i = 0; i < 12; i++) {
+    char filename[50];
+
+      sprintf(filename, "assets/player_idle/player_idle_%d.png", i + 1); 
+        
+      renderer->player_idle[i] = al_load_bitmap(filename);
+      must_init(renderer->player_idle[i], filename);
+  }
+
   //load the strong_enemy_idle
   for (int i = 0; i < 16; i++) {
     char filename[50];
@@ -219,31 +229,20 @@ void RenderHealthBar(Renderer* renderer, Status status, Asset asset, int x_left,
 
 }
 
-void RenderCreature(Renderer* renderer, int begin_x, int mid_y, int width) {
-  al_draw_filled_circle(begin_x + width / 2.0, mid_y, width, al_map_rgb(255, 255, 255));
-  float x_end = begin_x + width;
+void RenderCreature(Renderer* renderer, int x_left, int y_top) {
+  ALLEGRO_BITMAP* player_bitmap = al_create_bitmap(PLAYER_WIDTH, PLAYER_HEIGHT);
+  al_set_target_bitmap(player_bitmap);
 
-  float health_bar_y = mid_y + width + 20;
-  //RenderHealthBar(renderer, 220, 200 + 60, renderer->font);
+  int frame = (int)(al_get_time() * 4) % 12;
 
-  float xscale = 1, yscale = 1;
-
-  for(int i = 0; i < renderer->manager->enemies->enemy->num_actions; i++) {
-    char text[50] = "";
-    xscale = 1.5, yscale = 1.5;
-
-    if (renderer->manager->enemies->enemy[i].actions[i].type == attack) {
-      sprintf(text, "Attack: %d of damage!", renderer->manager->enemies->enemy[i].actions[i].effect);
-      ALLEGRO_COLOR color = al_map_rgb(255, 100, 100);
-      DrawScaledText(renderer->font, color, ENEMY_ACTION_X / xscale, ENEMY_ACTION_Y / yscale, xscale, yscale, ALLEGRO_ALIGN_CENTER, text);
-    }
-
-    if (renderer->manager->enemies->enemy[i].actions[i].type == defense) {
-      sprintf(text, "Defense: +%d of shield!\n", renderer->manager->enemies->enemy[i].actions[i].effect);
-      ALLEGRO_COLOR color = al_map_rgb(100, 100, 255);
-      DrawScaledText(renderer->font, color, ENEMY_ACTION_X / xscale, ENEMY_ACTION_Y / yscale, xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
-    }
+  for(int i = 0; i < 12; i++) {
+    al_draw_scaled_bitmap(renderer->player_idle[frame], 0, 0, al_get_bitmap_width(renderer->player_idle[frame]), 
+      al_get_bitmap_height(renderer->player_idle[frame]), 0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
   }
+
+  al_set_target_bitmap(renderer->display_buffer);
+  al_draw_scaled_bitmap(player_bitmap, 0, 0, PLAYER_WIDTH, PLAYER_HEIGHT, x_left, y_top, PLAYER_WIDTH, PLAYER_HEIGHT, 0);
+  al_destroy_bitmap(player_bitmap);
 }
 
 void RenderCard(const Renderer* renderer, int x_left, int y_top, type_of_card type, int effect, int energy_cost) {
@@ -300,6 +299,26 @@ void RenderPlayerHand(Renderer* renderer) {
   }
 }
 
+void RenderEnemyAction(Renderer* renderer, int i, int x_left, int y_top) {
+
+  float xscale = 1.3, yscale = 1.3;
+  char text[100] = "";
+  ALLEGRO_COLOR color = al_map_rgb(255, 255, 255);
+
+    if (renderer->manager->enemies->enemy[0].actions[renderer->manager->enemies->enemy->action_count].type == attack) {
+        sprintf(text, "Attack: %d", renderer->manager->enemies->enemy[i].actions[renderer->manager->enemies->enemy->action_count].effect);
+        color = al_map_rgb(200, 0, 0);
+    } 
+    else if (renderer->manager->enemies->enemy[0].actions[renderer->manager->enemies->enemy->action_count].type == defense) {
+        sprintf(text, "Defense: %d", renderer->manager->enemies->enemy[i].actions[renderer->manager->enemies->enemy->action_count].effect);
+        color = al_map_rgb(0, 0, 200);
+    }
+    if (text[0] != '\0') {
+        DrawScaledText(renderer->font, color, x_left, y_top, xscale, yscale, ALLEGRO_ALIGN_CENTER, text);
+    }
+
+}
+
 void RenderEnemy(Renderer* renderer, int x_left, int y_top, EnemyType type) {
   ALLEGRO_BITMAP* enemy_bitmap = al_create_bitmap(ENEMY_WIDTH, ENEMY_HEIGHT);
   al_set_target_bitmap(enemy_bitmap);
@@ -333,13 +352,15 @@ void RenderEnemies(Renderer* renderer) {
 
       if(renderer->manager->input_mode == INPUT_SELECT_TARGET && renderer->manager->selected_target_index == i){
         RenderEnemy(renderer, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + space, renderer->manager->enemies->enemy[i].type);
-        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, health_bar, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
-        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, shield_bar, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space + 25, renderer->font);
+        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, health_bar, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
+        RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, shield_bar, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space + 25, renderer->font);
+        RenderEnemyAction(renderer, i, ENEMY_BEGIN_X + 20, ENEMY_BEGIN_Y + space + 25);
       }
       else {
         RenderEnemy(renderer, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + space, renderer->manager->enemies->enemy[i].type);
         RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, health_bar, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
         RenderHealthBar(renderer, renderer->manager->enemies->enemy[i].status, shield_bar, ENEMY_BEGIN_X, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space + 25, renderer->font);
+        RenderEnemyAction(renderer, i, ENEMY_BEGIN_X + 40, ENEMY_BEGIN_Y + space + 25);
       }
     }
 
@@ -360,15 +381,52 @@ void RenderEnergy(Renderer* renderer) {
 
 }
 
+void RenderVictoryScreen(Renderer* renderer) {
+
+  al_draw_filled_rectangle(0, 0, DISPLAY_BUFFER_WIDTH, DISPLAY_BUFFER_HEIGHT, al_map_rgba(0, 0, 0, 220));
+
+  float center_x = DISPLAY_BUFFER_WIDTH / 2.0;
+  float center_y = DISPLAY_BUFFER_HEIGHT / 2.0;
+  float big_scale = 6.0;
+  float small_scale = 1.8;
+    
+  DrawCenteredScaledText(renderer->font, al_map_rgb(100, 255, 100), center_x / big_scale, (center_y - 80) / big_scale, big_scale, big_scale, "VITORIA!");
+  DrawCenteredScaledText(renderer->font, al_map_rgb(255, 255, 255), center_x / small_scale, (center_y + 120) / small_scale, small_scale, small_scale, "Pressione Enter para continuar");
+
+}
+
+
+void RenderDefeatScreen(Renderer* renderer) {
+  al_draw_filled_rectangle(0, 0, DISPLAY_BUFFER_WIDTH, DISPLAY_BUFFER_HEIGHT, al_map_rgba(0, 0, 0, 200));
+
+  float center_x = DISPLAY_BUFFER_WIDTH / 2.0; 
+  float center_y = DISPLAY_BUFFER_HEIGHT / 2.0;
+  float big_scale = 6.0;
+  float small_scale = 1.5;
+
+  DrawCenteredScaledText(renderer->font, al_map_rgb(255, 0, 0), center_x / big_scale, (center_y - 50) / big_scale, big_scale, big_scale, "GAME OVER");
+  DrawCenteredScaledText(renderer->font, al_map_rgb(200, 200, 200), center_x / small_scale, (center_y + 100) / small_scale, small_scale, small_scale, "Pressione Q para sair");
+}
+
 void Render(Renderer* renderer) {
   al_set_target_bitmap(renderer->display_buffer);
   RenderBackground(renderer);
-  RenderCreature(renderer, PLAYER_BEGIN_X, PLAYER_BEGIN_Y + PLAYER_RADIUS, PLAYER_RADIUS);
+  RenderCreature(renderer, PLAYER_BEGIN_X, PLAYER_BEGIN_Y);
   RenderEnergy(renderer);
   RenderEnemies(renderer);
-  RenderBackground2(renderer);
+  //RenderBackground2(renderer);
   RenderDeck(renderer);
   RenderPlayerHand(renderer);
+
+  if (renderer->manager) {
+    if (renderer->manager->state == victory) {
+      RenderVictoryScreen(renderer);
+    }
+    else if (renderer->manager->state == defeat) {
+      RenderDefeatScreen(renderer);
+    }
+  }
+
   al_set_target_backbuffer(renderer->display);
 
   al_draw_scaled_bitmap(renderer->display_buffer, 0, 0, DISPLAY_BUFFER_WIDTH, DISPLAY_BUFFER_HEIGHT, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
