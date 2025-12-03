@@ -80,10 +80,14 @@ void FillRenderer(Renderer* renderer) {
       must_init(renderer->strong_enemy_idle[i], filename);
   }
 
-  //load the health bar
+  //load the health bar and shield bar
   renderer->health_bar = 
       al_load_bitmap("assets/health_bar.png");
   must_init(renderer->health_bar, "health_bar");
+
+  renderer->shield_bar = 
+      al_load_bitmap("assets/shield_bar.png");
+  must_init(renderer->shield_bar, "shield_bar");
 
   //load the energy
   renderer->energy_indicator = 
@@ -143,16 +147,16 @@ void RenderDeck(Renderer* renderer) {
     al_get_bitmap_height(renderer->deck_pile), DRAW_DECK_X, DRAW_DECK_Y, DECK_WIDTH, DECK_HEIGHT, 0);
 
   al_draw_scaled_bitmap(renderer->discard_pile, 0, 0, al_get_bitmap_width(renderer->discard_pile), 
-    al_get_bitmap_height(renderer->discard_pile), 1180 - DRAW_DECK_X, DRAW_DECK_Y, DECK_WIDTH, DECK_HEIGHT, 0);
+    al_get_bitmap_height(renderer->discard_pile), 1150 - DRAW_DECK_X, DRAW_DECK_Y, DECK_WIDTH, DECK_HEIGHT, 0);
     
   char text[50] = "";
   int xscale = 2, yscale = 2;
 
-  sprintf(text, "%d/%d", renderer->manager->player->deck.deck_size, renderer->manager->player->deck.max_size);
-  DrawScaledText(renderer->font, al_map_rgb(0, 0, 0), (DECK_WIDTH / 2) - 20, 200 + (DECK_HEIGHT / 2), xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
+  sprintf(text, "%d", renderer->manager->player->deck.deck_size); // renderer->manager->player->deck.max_size
+  DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), (DECK_WIDTH / 2) - 28, 226 + (DECK_HEIGHT / 2), xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
 
-  sprintf(text, "%d/%d", renderer->manager->player->discard_pile.deck_size, renderer->manager->player->discard_pile.max_size);
-  DrawScaledText(renderer->font, al_map_rgb(0, 0, 0), (DECK_WIDTH / 2) + 525, 200 + (DECK_HEIGHT / 2), xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
+  sprintf(text, "%d", renderer->manager->player->discard_pile.deck_size); // add this if i want to show the max renderer->manager->player->discard_pile.max_size
+  DrawScaledText(renderer->font, al_map_rgb(255, 255, 255), (DECK_WIDTH / 2) + 498, 226 + (DECK_HEIGHT / 2), xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
 }
 
 void RenderHealthBar(Renderer* renderer, Status status, int x_left, int y_top, ALLEGRO_FONT* font) {
@@ -304,7 +308,7 @@ void RenderEnemies(Renderer* renderer) {
       }
     }
 
-    space += 180;
+    space += 220;
   }
 }
 

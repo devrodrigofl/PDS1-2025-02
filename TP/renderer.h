@@ -26,6 +26,7 @@ typedef struct {
   ALLEGRO_BITMAP *strong_enemy_idle[16];
 
   ALLEGRO_BITMAP *health_bar;
+  ALLEGRO_BITMAP *shield_bar;
   ALLEGRO_BITMAP *energy_indicator;
 
   ALLEGRO_BITMAP *discard_pile;
