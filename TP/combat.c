@@ -121,6 +121,16 @@ void combatUpdate(CombatManager* manager) {
         manager->state = victory;
         printf("Victory! all enemies were defeated.\n");
     }
+    
+    if (manager->enemies->enemy[manager->selected_target_index].status.current_hp <= 0) {
+
+        for (int i = 0; i < manager->enemies->count; i++) {
+            if (manager->enemies->enemy[i].status.current_hp > 0) {
+                manager->selected_target_index = i;
+                break;
+            }
+        }
+    }
 }
 
 int isKeyPressed(unsigned char* keys, int key_code) {
