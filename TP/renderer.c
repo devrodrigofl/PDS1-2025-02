@@ -120,6 +120,11 @@ void FillRenderer(Renderer* renderer) {
       must_init(renderer->strong_enemy_idle[i], filename);
   }
 
+  //load the weak_enemy
+  renderer->weak_enemy = 
+      al_load_bitmap("assets/weak_enemy.png");
+  must_init(renderer->weak_enemy, "weak_enemy");
+
   //load the health bar and shield bar
   renderer->health_bar = 
       al_load_bitmap("assets/health_bar.png");
@@ -363,8 +368,8 @@ void RenderEnemy(Renderer* renderer, int x_left, int y_top, EnemyType type) {
   }
 
   if (type == weak) {
-    al_draw_scaled_bitmap(renderer->strong_enemy_idle[frame], 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle[frame]), 
-      al_get_bitmap_height(renderer->strong_enemy_idle[frame]), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+    al_draw_scaled_bitmap(renderer->weak_enemy, 0, 0, al_get_bitmap_width(renderer->weak_enemy), 
+      al_get_bitmap_height(renderer->weak_enemy), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
   }
 
   al_set_target_bitmap(renderer->display_buffer);
