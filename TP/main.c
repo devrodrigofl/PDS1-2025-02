@@ -37,26 +37,28 @@ int main() {
   FillRenderer(&renderer);
   al_register_event_source(queue, al_get_display_event_source(renderer.display));
   
-  //INICIALIZAÇÃO DO JOGO
-    printf("=== INICIANDO O JOGO ===\n");
-    int current_round = 0;
+  printf("=== Starting game ===\n");
+  int current_round = 0;
 
-    Player player;
-    buildPlayer(&player);
-    printf("> Player criado com %d/3 Energia e %d Cartas no Deck.\n", player.current_energy, player.deck.deck_size);
+  Player player;
+  buildPlayer(&player);
+  printf("> player created with %d/3 of energy on %d cards on the deck.\n", player.current_energy, player.deck.deck_size);
 
-    EnemyGroup enemies;
-    buildEnemyGroup(&enemies, current_round);
-    printf("> Grupo de Inimigos criado com %d inimigos.\n", enemies.count);
+  EnemyGroup enemies;
+  buildEnemyGroup(&enemies, current_round);
+  printf("> Enemy group created with %d enemies.\n", enemies.count);
 
-    CombatManager combat_manager;
-    startCombat(&combat_manager, &player, &enemies);
-    printf("> Combate Iniciado! Turno do Jogador.\n");
-    printf("========================\n\n");
+  CombatManager combat_manager;
+  startCombat(&combat_manager, &player, &enemies);
+  printf("> Combat started! Player turn.\n");
+  printf("========================\n\n");
 
+    int menu_option = 0; // 0 = Começar, 1 = Sair
+    int menu_cooldown = 0;
     combat_manager.current_round = current_round;
+    combat_manager.state = menu;
 
-    printf(">>> INICIO DO ROUND %d/%d <<<\n", combat_manager.current_round, TOTAL_ROUNDS);
+    printf(">>> begining of the round %d/%d <<<\n", combat_manager.current_round, TOTAL_ROUNDS);
 
     renderer.manager = &combat_manager;
     int victory_timer = 0;
@@ -74,57 +76,91 @@ int main() {
           break;
         }
 
-        combatHandleInput(&combat_manager, keyboard_keys);
-        combatUpdate(&combat_manager);
-        
-        if (keyboard_keys[ALLEGRO_KEY_SPACE]) {
-          renderer.manager->state = victory;
+        if (combat_manager.state == menu) {
+                    
+          if (menu_cooldown > 0) menu_cooldown--;
+
+          if (menu_cooldown == 0) {
+            if (keyboard_keys[ALLEGRO_KEY_UP]) {
+              menu_option--;
+              if (menu_option < 0) menu_option = 1;
+              menu_cooldown = 10;
+            }
+            if (keyboard_keys[ALLEGRO_KEY_DOWN]) {
+              menu_option++;
+              if (menu_option > 1) menu_option = 0;
+              menu_cooldown = 10;
+            }
+            combat_manager.selected_menu_index = menu_option;
+          }
+
+          if (keyboard_keys[ALLEGRO_KEY_ENTER] & GAME_KEY_SEEN) {
+          if (menu_option == 0) {
+                    current_round = 1;
+                    combat_manager.current_round = 1;
+                    //buildPlayer(&player);
+                    //buildEnemyGroup(&enemies, current_round);
+                    //startCombat(&combat_manager, &player, &enemies); 
+
+                    combat_manager.state = player_turn;
+                    combatHandleInput(&combat_manager, keyboard_keys);
+                    combatUpdate(&combat_manager);
+          } else done = 1;
+                keyboard_keys[ALLEGRO_KEY_ENTER] &= ~GAME_KEY_SEEN;
+            }
         }
-        
-        if (combat_manager.state == victory) {
+        else {
 
-          victory_timer++;
+          combatHandleInput(&combat_manager, keyboard_keys);
+          combatUpdate(&combat_manager);
           
-          if (victory_timer > 30) {
-
-            if (keyboard_keys[ALLEGRO_KEY_ENTER] & GAME_KEY_SEEN) {
-              
-              if (combat_manager.current_round < TOTAL_ROUNDS) {
-                printf("\n=== VITORIA NO ROUND %d! ===\n", combat_manager.current_round);
-                printf("Preparando proximo combate...\n");
+          if (keyboard_keys[ALLEGRO_KEY_SPACE]) {
+            renderer.manager->state = victory;
+          }
+          
+          if (combat_manager.state == victory) {
+  
+            victory_timer++;
+            
+            if (victory_timer > 30) {
+  
+              if (keyboard_keys[ALLEGRO_KEY_ENTER] & GAME_KEY_SEEN) {
                 
-                current_round++;
-                combat_manager.current_round++;
-    
-                discardAllCards(&player.hand, &player.deck);
-                discardAllCards(&player.discard_pile, &player.deck);
-                ShuffleDeck(&player.deck);
-                buildEnemyGroup(&enemies, combat_manager.current_round);
-                startCombat(&combat_manager, &player, &enemies);
-
-                victory_timer = 0;
-    
-                printf(">>> INICIO DO ROUND %d/%d <<<\n", combat_manager.current_round, TOTAL_ROUNDS);
-    
-              } else {
+                if (combat_manager.current_round < TOTAL_ROUNDS) {
+                  printf("\n=== Win on round %d! ===\n", combat_manager.current_round);
+                  
+                  current_round++;
+                  combat_manager.current_round++;
+      
+                  discardAllCards(&player.hand, &player.deck);
+                  discardAllCards(&player.discard_pile, &player.deck);
+                  ShuffleDeck(&player.deck);
+                  buildEnemyGroup(&enemies, combat_manager.current_round);
+                  startCombat(&combat_manager, &player, &enemies);
+  
+                  victory_timer = 0;
+      
+                  printf(">>> begining of round %d/%d <<<\n", combat_manager.current_round, TOTAL_ROUNDS);
+      
+                } else {
+                  printf("\n=================================\n");
+                  printf("              You win!            \n");
+                  printf("=================================\n");
+                  //done = 1;
+                }
+              }
+              else if (combat_manager.state == defeat) {
                 printf("\n=================================\n");
-                printf("   PARABENS! VOCE COMPLETOU A TORRE!   \n");
+                printf("      GAME OVER - You died      \n");
+                printf("      You maked to round %d/%d     \n", combat_manager.current_round, TOTAL_ROUNDS);
                 printf("=================================\n");
                 done = 1;
               }
             }
-            else if (combat_manager.state == defeat) {
-              printf("\n=================================\n");
-              printf("      GAME OVER - Voce Morreu      \n");
-              printf("      Chegou ate o Round %d/%d     \n", combat_manager.current_round, TOTAL_ROUNDS);
-              printf("=================================\n");
-              done = 1;
-            }
-          }
-            
-          keyboard_keys[ALLEGRO_KEY_ENTER] &= ~GAME_KEY_SEEN;
-
-        } else victory_timer = 0;
+            keyboard_keys[ALLEGRO_KEY_ENTER] &= ~GAME_KEY_SEEN;
+    
+          } else victory_timer = 0;
+        }
 
         for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
           keyboard_keys[i] &= ~GAME_KEY_SEEN;

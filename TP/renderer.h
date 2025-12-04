@@ -42,6 +42,8 @@ typedef struct {
   
   ALLEGRO_FONT* font;
 
+  int menu_selection;
+
 } Renderer;
 
 void FillRenderer(Renderer* renderer);

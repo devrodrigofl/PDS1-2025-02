@@ -451,9 +451,15 @@ void RenderVictoryScreen(Renderer* renderer) {
   float big_scale = 6.0;
   float small_scale = 1.8;
     
-  DrawCenteredScaledText(renderer->font, al_map_rgb(100, 255, 100), center_x / big_scale, (center_y - 80) / big_scale, big_scale, big_scale, "VITORIA!");
-  DrawCenteredScaledText(renderer->font, al_map_rgb(255, 255, 255), center_x / small_scale, (center_y + 120) / small_scale, small_scale, small_scale, "Pressione Enter para continuar");
+  DrawCenteredScaledText(renderer->font, al_map_rgb(100, 255, 100), center_x / big_scale, (center_y - 80) / big_scale, big_scale, big_scale, "WIN!");
 
+  if(renderer->manager->current_round >= TOTAL_ROUNDS) {
+    DrawCenteredScaledText(renderer->font, al_map_rgb(255, 255, 255), center_x / small_scale, (center_y + 120) / small_scale, small_scale, small_scale, "Press Q to quit");
+  }
+  else {
+    DrawCenteredScaledText(renderer->font, al_map_rgb(255, 255, 255), center_x / small_scale, (center_y + 120) / small_scale, small_scale, small_scale, "Press Enter to continue");
+  }
+  
 }
 
 
@@ -466,7 +472,7 @@ void RenderDefeatScreen(Renderer* renderer) {
   float small_scale = 1.5;
 
   DrawCenteredScaledText(renderer->font, al_map_rgb(255, 0, 0), center_x / big_scale, (center_y - 50) / big_scale, big_scale, big_scale, "GAME OVER");
-  DrawCenteredScaledText(renderer->font, al_map_rgb(200, 200, 200), center_x / small_scale, (center_y + 100) / small_scale, small_scale, small_scale, "Pressione Q para sair");
+  DrawCenteredScaledText(renderer->font, al_map_rgb(200, 200, 200), center_x / small_scale, (center_y + 100) / small_scale, small_scale, small_scale, "Press Q tom quit");
 }
 
 void RenderFloorHeader(Renderer* renderer) {
@@ -487,23 +493,56 @@ void RenderFloorHeader(Renderer* renderer) {
     DrawScaledText(renderer->font, black_color, center_x / 2.0, 10 / 2.0, 2.0, 2.0, ALLEGRO_ALIGN_CENTRE, text);
 }
 
+void RenderMenu(Renderer* renderer) {
+
+    if (renderer->background_1) {
+      al_draw_tinted_scaled_bitmap(renderer->background_1, al_map_rgba_f(0.3, 0.3, 0.3, 1), 0, 0, al_get_bitmap_width(renderer->background_1), 
+        al_get_bitmap_height(renderer->background_1), 0, 0, DISPLAY_BUFFER_WIDTH, DISPLAY_BUFFER_HEIGHT, 0);
+    }
+
+    float center_x = DISPLAY_BUFFER_WIDTH / 2.0;
+    float center_y = DISPLAY_BUFFER_HEIGHT / 2.0;
+
+    DrawCenteredScaledText(renderer->font, al_map_rgb(200, 50, 50), center_x / 4.0, (center_y - 150) / 4.0, 4.0, 4.0, "SLAY THE SPIRE\nPDS 2025/02\nRODRIGO LANZA");
+
+    ALLEGRO_COLOR color_start = (renderer->manager->selected_menu_index == 0) ? al_map_rgb(255, 215, 0) : al_map_rgb(150, 150, 150);
+    ALLEGRO_COLOR color_quit  = (renderer->manager->selected_menu_index == 1) ? al_map_rgb(255, 215, 0) : al_map_rgb(150, 150, 150);
+    
+    // Escalas: A opção selecionada fica um pouco maior
+    float scale_start = (renderer->manager->selected_menu_index == 0) ? 2.5 : 2.0;
+    float scale_quit  = (renderer->manager->selected_menu_index == 1) ? 2.5 : 2.0;
+
+    DrawCenteredScaledText(renderer->font, color_start, center_x / scale_start, (center_y + 50) / scale_start, scale_start, scale_start, "START");
+    DrawCenteredScaledText(renderer->font, color_quit, center_x / scale_quit, (center_y + 120) / scale_quit, scale_quit, scale_quit, "Quit");           
+
+    al_set_target_backbuffer(renderer->display);
+    al_draw_scaled_bitmap(renderer->display_buffer, 0, 0, DISPLAY_BUFFER_WIDTH, DISPLAY_BUFFER_HEIGHT, 0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, 0);
+    al_flip_display();
+}
+
 void Render(Renderer* renderer) {
   al_set_target_bitmap(renderer->display_buffer);
-  RenderBackground(renderer);
-  RenderCreature(renderer, PLAYER_BEGIN_X, PLAYER_BEGIN_Y);
-  RenderEnergy(renderer);
-  RenderEnemies(renderer);
-  //RenderBackground2(renderer);
-  RenderDeck(renderer);
-  RenderPlayerHand(renderer);
-  RenderFloorHeader(renderer);
 
-  if (renderer->manager) {
-    if (renderer->manager->state == victory) {
-      RenderVictoryScreen(renderer);
-    }
-    else if (renderer->manager->state == defeat) {
-      RenderDefeatScreen(renderer);
+  if (renderer->manager->state == menu) {
+    RenderMenu(renderer); 
+  }
+  else {
+    RenderBackground(renderer);
+    RenderCreature(renderer, PLAYER_BEGIN_X, PLAYER_BEGIN_Y);
+    RenderEnergy(renderer);
+    RenderEnemies(renderer);
+    //RenderBackground2(renderer);
+    RenderDeck(renderer);
+    RenderPlayerHand(renderer);
+    RenderFloorHeader(renderer);
+  
+    if (renderer->manager) {
+      if (renderer->manager->state == victory) {
+        RenderVictoryScreen(renderer);
+      }
+      else if (renderer->manager->state == defeat) {
+        RenderDefeatScreen(renderer);
+      }
     }
   }
 
@@ -539,6 +578,6 @@ void ClearRenderer(Renderer* renderer) {
         }
         else sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_00%d.png", i + 1);
 
-        al_destroy_bitmap(renderer->strong_enemy);
+        al_destroy_bitmap(renderer->weak_enemy_idle[i]);
     }
 }

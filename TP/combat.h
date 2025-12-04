@@ -12,6 +12,8 @@ typedef enum InputState {
 } InputState;
 
 typedef enum CombatState{
+    menu,
+    playing,
     player_turn,
     enemy_turn,
     victory,
@@ -25,6 +27,7 @@ typedef struct {
     InputState input_mode;  
     int selected_card_index;
     int selected_target_index;
+    int selected_menu_index;
     int current_round;
 } CombatManager;
 
