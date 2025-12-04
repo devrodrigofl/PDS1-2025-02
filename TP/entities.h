@@ -37,7 +37,7 @@ typedef struct Player{
 typedef struct Enemy{
     Status status;
     EnemyType type;
-    EnemyAction actions[3];
+    EnemyAction actions[5];
     int action_count;
     int num_actions;
     float x_axis;

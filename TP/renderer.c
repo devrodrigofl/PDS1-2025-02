@@ -112,18 +112,18 @@ void FillRenderer(Renderer* renderer) {
     char filename[50];
 
       if(i < 9) {
-        sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_000%d.png", i + 1); 
+        sprintf(filename, "assets/weak_enemy_idle/Idle_Body_270_000%d.png", i + 1); 
       }
-      else sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_00%d.png", i + 1);
+      else sprintf(filename, "assets/weak_enemy_idle/Idle_Body_270_00%d.png", i + 1);
         
-      renderer->strong_enemy_idle[i] = al_load_bitmap(filename);
-      must_init(renderer->strong_enemy_idle[i], filename);
+      renderer->weak_enemy_idle[i] = al_load_bitmap(filename);
+      must_init(renderer->weak_enemy_idle[i], filename);
   }
 
   //load the weak_enemy
-  renderer->weak_enemy = 
-      al_load_bitmap("assets/weak_enemy.png");
-  must_init(renderer->weak_enemy, "weak_enemy");
+  renderer->strong_enemy = 
+      al_load_bitmap("assets/strong_enemy.png");
+  must_init(renderer->strong_enemy, "strong_enemy");
 
   //load the boss_enemy
   renderer->boss_enemy = 
@@ -368,27 +368,18 @@ void RenderEnemy(Renderer* renderer, int x_left, int y_top, EnemyType type) {
   int frame = (int)(al_get_time() * 16) % 16;
 
   if (type == strong) {
-    al_draw_scaled_bitmap(renderer->strong_enemy_idle[frame], 0, 0, al_get_bitmap_width(renderer->strong_enemy_idle[frame]), 
-      al_get_bitmap_height(renderer->strong_enemy_idle[frame]), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+    al_draw_scaled_bitmap(renderer->strong_enemy, 0, 0, al_get_bitmap_width(renderer->strong_enemy), 
+      al_get_bitmap_height(renderer->strong_enemy), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
   }
 
   if (type == weak) {
-    al_draw_scaled_bitmap(renderer->weak_enemy, 0, 0, al_get_bitmap_width(renderer->weak_enemy), 
-      al_get_bitmap_height(renderer->weak_enemy), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
+    al_draw_scaled_bitmap(renderer->weak_enemy_idle[frame], 0, 0, al_get_bitmap_width(renderer->weak_enemy_idle[frame]), 
+      al_get_bitmap_height(renderer->weak_enemy_idle[frame]), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
   }
 
   if (type == boss) {
-        
-        ALLEGRO_BITMAP* boss = renderer->boss_enemy;
-        
-        float scale = 2.0;
-        
-        int y_adjust = (256 * scale) - 256; 
-
-        al_draw_scaled_bitmap(boss, 0, 0, al_get_bitmap_width(boss), al_get_bitmap_height(boss), x_left - 50, y_top - y_adjust,
-          al_get_bitmap_width(boss) * scale, al_get_bitmap_height(boss) * scale, 0);
-        
-        return;
+    al_draw_scaled_bitmap(renderer->boss_enemy, 0, 0, al_get_bitmap_width(renderer->boss_enemy), 
+      al_get_bitmap_height(renderer->boss_enemy), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
     }
 
   al_set_target_bitmap(renderer->display_buffer);
@@ -400,10 +391,19 @@ void RenderEnemies(Renderer* renderer) {
   int space = 0;
 
   if(renderer->manager->current_round == 11) {
-    RenderEnemy(renderer, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + space, boss);
-    RenderHealthBar(renderer, renderer->manager->enemies->enemy[0].status, health_bar, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
-    RenderHealthBar(renderer, renderer->manager->enemies->enemy[0].status, shield_bar, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space + 25, renderer->font);
-    RenderEnemyAction(renderer, 0, ENEMY_BEGIN_X + 20, ENEMY_BEGIN_Y + space + 25);
+    if(renderer->manager->input_mode == INPUT_SELECT_TARGET && renderer->manager->selected_target_index == 0){
+      RenderEnemy(renderer, ENEMY_BEGIN_X - 150, ENEMY_BEGIN_Y + 100, boss);
+      RenderHealthBar(renderer, renderer->manager->enemies->enemy[0].status, health_bar, ENEMY_BEGIN_X - 150, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + 100, renderer->font);
+      RenderHealthBar(renderer, renderer->manager->enemies->enemy[0].status, shield_bar, ENEMY_BEGIN_X - 150, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + 100 + 25, renderer->font);
+      RenderEnemyAction(renderer, 0, ENEMY_BEGIN_X + 20 - 130, ENEMY_BEGIN_Y + 100 + 25);
+    }
+    else {
+      RenderEnemy(renderer, ENEMY_BEGIN_X - 50, ENEMY_BEGIN_Y + 100, boss);
+      RenderHealthBar(renderer, renderer->manager->enemies->enemy[0].status, health_bar, ENEMY_BEGIN_X - 50, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + 100, renderer->font);
+      RenderHealthBar(renderer, renderer->manager->enemies->enemy[0].status, shield_bar, ENEMY_BEGIN_X - 50, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + 100 + 25, renderer->font);
+      RenderEnemyAction(renderer, 0, ENEMY_BEGIN_X + 20 - 50, ENEMY_BEGIN_Y + 100 + 25);
+    }
+  
     return;
   }
 
@@ -539,6 +539,6 @@ void ClearRenderer(Renderer* renderer) {
         }
         else sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_00%d.png", i + 1);
 
-        al_destroy_bitmap(renderer->strong_enemy_idle[i]);
+        al_destroy_bitmap(renderer->strong_enemy);
     }
 }
