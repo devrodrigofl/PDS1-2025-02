@@ -569,3 +569,34 @@ void ClearRenderer(Renderer* renderer) {
   al_destroy_bitmap(renderer->card_defense);
   al_destroy_bitmap(renderer->card_especial);
 }
+  /*
+  
+  al_destroy_bitmap(renderer->health_bar);
+  al_destroy_bitmap(renderer->shield_bar);
+  al_destroy_bitmap(renderer->energy_indicator);
+
+  al_destroy_bitmap(renderer->discard_pile);
+  al_destroy_bitmap(renderer->deck_pile);
+
+  al_destroy_bitmap(renderer->strong_enemy);
+  al_destroy_bitmap(renderer->boss_enemy);
+  
+  //clear the strong_enemy_idle
+  for (int i = 0; i < 16; i++) {
+    char filename[50];
+
+    if(i < 9) {
+      sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_000%d.png", i + 1); 
+    }
+    else sprintf(filename, "assets/strong_enemy_idle/Idle_Body_270_00%d.png", i + 1);
+
+    al_destroy_bitmap(renderer->weak_enemy_idle[i]);
+  }
+
+for (int i = 0; i < 16; i++) {
+  char filename[50];
+  sprintf(filename, "assets/player_idle_%d", i + 1); 
+  al_destroy_bitmap(renderer->player_idle[i]);
+  }
+}
+  */
