@@ -1,6 +1,8 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -17,8 +19,20 @@ int main() {
   must_init(al_init_image_addon(), "allegro");
   must_init(al_init_primitives_addon(), "primitives");
   must_init(al_install_keyboard(), "keyboard");
+  must_init(al_install_audio(), "audio");
+  must_init(al_init_acodec_addon(), "audio codecs");
+  al_reserve_samples(1);
   
   srand(time(0));
+
+  ALLEGRO_SAMPLE* song = al_load_sample("assets/menu_theme.ogg");
+  must_init(song, "music file");
+
+  ALLEGRO_SAMPLE_INSTANCE* songInstance = al_create_sample_instance(song);
+  al_attach_sample_instance_to_mixer(songInstance, al_get_default_mixer());
+  
+  al_set_sample_instance_playmode(songInstance, ALLEGRO_PLAYMODE_LOOP);
+  al_play_sample_instance(songInstance);
 
   ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0);
   must_init(timer, "timer");
@@ -188,6 +202,8 @@ int main() {
   }
   al_destroy_timer(timer);
   al_destroy_event_queue(queue);
+  al_destroy_sample_instance(songInstance);
+  al_destroy_sample(song);
   ClearRenderer(&renderer);
   return 0;
 }
