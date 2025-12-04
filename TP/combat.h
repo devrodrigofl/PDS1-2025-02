@@ -1,8 +1,8 @@
 #ifndef COMBAT_H
 #define COMBAT_H
 
-#include "entities.h"
 #include "constants.h"
+#include "entities.h"
 #include <stdio.h>
 #include <allegro5/allegro.h>
 

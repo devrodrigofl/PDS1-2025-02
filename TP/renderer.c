@@ -125,6 +125,11 @@ void FillRenderer(Renderer* renderer) {
       al_load_bitmap("assets/weak_enemy.png");
   must_init(renderer->weak_enemy, "weak_enemy");
 
+  //load the boss_enemy
+  renderer->boss_enemy = 
+      al_load_bitmap("assets/boss_enemy.png");
+  must_init(renderer->boss_enemy, "boss_enemy");
+
   //load the health bar and shield bar
   renderer->health_bar = 
       al_load_bitmap("assets/health_bar.png");
@@ -372,6 +377,20 @@ void RenderEnemy(Renderer* renderer, int x_left, int y_top, EnemyType type) {
       al_get_bitmap_height(renderer->weak_enemy), 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
   }
 
+  if (type == boss) {
+        
+        ALLEGRO_BITMAP* boss = renderer->boss_enemy;
+        
+        float scale = 2.0;
+        
+        int y_adjust = (256 * scale) - 256; 
+
+        al_draw_scaled_bitmap(boss, 0, 0, al_get_bitmap_width(boss), al_get_bitmap_height(boss), x_left - 50, y_top - y_adjust,
+          al_get_bitmap_width(boss) * scale, al_get_bitmap_height(boss) * scale, 0);
+        
+        return;
+    }
+
   al_set_target_bitmap(renderer->display_buffer);
   al_draw_scaled_bitmap(enemy_bitmap, 0, 0, ENEMY_WIDTH, ENEMY_HEIGHT, x_left, y_top, ENEMY_WIDTH, ENEMY_HEIGHT, 0);
   al_destroy_bitmap(enemy_bitmap);
@@ -379,6 +398,15 @@ void RenderEnemy(Renderer* renderer, int x_left, int y_top, EnemyType type) {
 
 void RenderEnemies(Renderer* renderer) {
   int space = 0;
+
+  if(renderer->manager->current_round == 11) {
+    RenderEnemy(renderer, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + space, boss);
+    RenderHealthBar(renderer, renderer->manager->enemies->enemy[0].status, health_bar, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space, renderer->font);
+    RenderHealthBar(renderer, renderer->manager->enemies->enemy[0].status, shield_bar, ENEMY_BEGIN_X - 100, ENEMY_BEGIN_Y + ENEMY_HEALTH_BAR + space + 25, renderer->font);
+    RenderEnemyAction(renderer, 0, ENEMY_BEGIN_X + 20, ENEMY_BEGIN_Y + space + 25);
+    return;
+  }
+
   for(int i = 0; i < renderer->manager->enemies->count; i ++) {
 
     if(renderer->manager->enemies->enemy[i].status.current_hp > 0) {

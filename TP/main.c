@@ -39,13 +39,14 @@ int main() {
   
   //INICIALIZAÇÃO DO JOGO
     printf("=== INICIANDO O JOGO ===\n");
+    int current_round = 0;
 
     Player player;
     buildPlayer(&player);
     printf("> Player criado com %d/3 Energia e %d Cartas no Deck.\n", player.current_energy, player.deck.deck_size);
 
     EnemyGroup enemies;
-    buildEnemyGroup(&enemies);
+    buildEnemyGroup(&enemies, current_round);
     printf("> Grupo de Inimigos criado com %d inimigos.\n", enemies.count);
 
     CombatManager combat_manager;
@@ -53,7 +54,7 @@ int main() {
     printf("> Combate Iniciado! Turno do Jogador.\n");
     printf("========================\n\n");
 
-    combat_manager.current_round = 0;
+    combat_manager.current_round = current_round;
 
     printf(">>> INICIO DO ROUND %d/%d <<<\n", combat_manager.current_round, TOTAL_ROUNDS);
 
@@ -91,13 +92,14 @@ int main() {
               if (combat_manager.current_round < TOTAL_ROUNDS) {
                 printf("\n=== VITORIA NO ROUND %d! ===\n", combat_manager.current_round);
                 printf("Preparando proximo combate...\n");
-                    
+                
+                current_round++;
                 combat_manager.current_round++;
     
                 discardAllCards(&player.hand, &player.deck);
                 discardAllCards(&player.discard_pile, &player.deck);
                 ShuffleDeck(&player.deck);
-                buildEnemyGroup(&enemies);
+                buildEnemyGroup(&enemies, combat_manager.current_round);
                 startCombat(&combat_manager, &player, &enemies);
 
                 victory_timer = 0;
@@ -121,7 +123,7 @@ int main() {
           }
             
           keyboard_keys[ALLEGRO_KEY_ENTER] &= ~GAME_KEY_SEEN;
-          
+
         } else victory_timer = 0;
 
         for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {

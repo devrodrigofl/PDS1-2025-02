@@ -10,6 +10,7 @@
 typedef enum EnemyType {
     weak = 0,
     strong = 1,
+    boss = 2,
 } EnemyType;
 
 typedef struct EnemyAction {
@@ -58,7 +59,7 @@ int numActions(EnemyType type);
 int actionsCost(EnemyType type);
 void buildEnemy(Enemy* enemy);
 
-void buildEnemyGroup(EnemyGroup* group);
+void buildEnemyGroup(EnemyGroup* group, int current_round);
 int combatState(EnemyGroup* group);
 
 #endif

@@ -50,7 +50,7 @@
 #define ENERGY_WIDTH 220
 #define ENERGY_HEIGHT 220
 
-#define TOTAL_ROUNDS 10
+#define TOTAL_ROUNDS 11
 
 // You might want to use this.
 typedef enum {
