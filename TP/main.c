@@ -133,6 +133,11 @@ int main() {
           if (keyboard_keys[ALLEGRO_KEY_SPACE]) {
             renderer.manager->state = victory;
           }
+
+          if (keyboard_keys[ALLEGRO_KEY_X]) {
+            renderer.manager->player->status.current_hp = 1;
+            renderer.manager->player->status.current_shield = 0;
+          }
           
           if (combat_manager.state == victory) {
   
