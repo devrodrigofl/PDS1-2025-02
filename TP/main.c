@@ -67,7 +67,7 @@ int main() {
   printf("> Combat started! Player turn.\n");
   printf("========================\n\n");
 
-    int menu_option = 0; // 0 = Começar, 1 = Sair
+    int menu_option = 0;
     int menu_cooldown = 0;
     combat_manager.current_round = current_round;
     combat_manager.state = menu;
@@ -110,15 +110,17 @@ int main() {
 
           if (keyboard_keys[ALLEGRO_KEY_ENTER] & GAME_KEY_SEEN) {
           if (menu_option == 0) {
-                    current_round = 1;
-                    combat_manager.current_round = 1;
-                    //buildPlayer(&player);
-                    //buildEnemyGroup(&enemies, current_round);
-                    //startCombat(&combat_manager, &player, &enemies); 
+            current_round = 1;
+            combat_manager.current_round = 1;
+            combat_manager.state = player_turn;
 
-                    combat_manager.state = player_turn;
-                    combatHandleInput(&combat_manager, keyboard_keys);
-                    combatUpdate(&combat_manager);
+            for (int i = 0; i < ALLEGRO_KEY_MAX; i++) {
+              keyboard_keys[i] = 0;
+            }
+
+            combatHandleInput(&combat_manager, keyboard_keys);
+            combatUpdate(&combat_manager);
+
           } else done = 1;
                 keyboard_keys[ALLEGRO_KEY_ENTER] &= ~GAME_KEY_SEEN;
             }
@@ -160,7 +162,6 @@ int main() {
                   printf("\n=================================\n");
                   printf("              You win!            \n");
                   printf("=================================\n");
-                  //done = 1;
                 }
               }
               else if (combat_manager.state == defeat) {
