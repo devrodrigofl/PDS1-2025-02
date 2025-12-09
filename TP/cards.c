@@ -65,9 +65,11 @@ void generateDeck (Deck* deck) {
     deck->cards[i++] = generateCard(defense, 1);
     deck->cards[i++] = generateCard(defense, 2);
     deck->cards[i++] = generateCard(defense, 3);
+
+    deck->cards[i++] = generateCard(hybrid, 3);
     
     //randomly generates the last 2 defense cards
-    for(int j = 0; j < 2; j++) {
+    for(int j = 0; j < 1; j++) {
         deck->cards[i++] = generateCard(defense, (rand() % 3));
     }
 

@@ -27,6 +27,7 @@ typedef struct {
   ALLEGRO_BITMAP *card_attack;
   ALLEGRO_BITMAP *card_defense;
   ALLEGRO_BITMAP *card_especial;
+  ALLEGRO_BITMAP *card_hybrid;
 
   ALLEGRO_BITMAP *strong_enemy;
   ALLEGRO_BITMAP *weak_enemy_idle[16];

@@ -9,6 +9,7 @@ typedef enum type_of_card{
     attack = 0,
     defense = 1,
     especial = 2,
+    hybrid = 3,
 } type_of_card;
 
 typedef enum status_of_card{

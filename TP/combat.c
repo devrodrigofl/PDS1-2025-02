@@ -45,6 +45,11 @@ void executeAction(CombatManager* manager, Status* user, Status* target, type_of
         discardAllCards(&manager->player->hand, &manager->player->discard_pile);
         buildHand(&manager->player->hand, &manager->player->deck, &manager->player->discard_pile, 5);
     }
+    else if (type == hybrid) {
+        printf("Hybrid: +%d of shield and damage!\n", effect);
+        takeDamage(target, effect);
+        addShield(user, effect - 3);
+    }
 }
 
 
@@ -197,7 +202,7 @@ void combatHandleInput(CombatManager* manager, unsigned char* keys) {
             if (manager->player->current_energy >= card_selected->energy_cost) {
                 
                 //attack chose target
-                if (played_card_type == attack) {
+                if (played_card_type == attack || played_card_type == hybrid) {
                     manager->input_mode = INPUT_SELECT_TARGET;
                     manager->selected_target_index = 0;
                     printf("Selecione o alvo\n");

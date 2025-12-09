@@ -93,6 +93,10 @@ void FillRenderer(Renderer* renderer) {
       al_load_bitmap("assets/card_defense.png");
   must_init(renderer->card_defense, "card_defense");
 
+  renderer->card_hybrid = 
+      al_load_bitmap("assets/card_hybrid.png");
+  must_init(renderer->card_especial, "card_hybrid");
+
   renderer->card_especial = 
       al_load_bitmap("assets/card_especial.png");
   must_init(renderer->card_especial, "card_especial");
@@ -318,6 +322,14 @@ void RenderCard(const Renderer* renderer, int x_left, int y_top, type_of_card ty
         al_get_bitmap_height(renderer->card_especial), 0, 0, CARD_WIDTH, CARD_HEIGHT, 0);
 
       sprintf(text, "Especial:\n\n\nEffect:\nnew hand!");
+      DrawScaledText(renderer->font, color, (CARD_WIDTH * 0.14) / xscale, (CARD_HEIGHT * 0.07) / yscale, xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
+  }
+
+  if (renderer->card_hybrid && type == hybrid) {
+      al_draw_scaled_bitmap(renderer->card_hybrid, 0, 0, al_get_bitmap_width(renderer->card_hybrid), 
+        al_get_bitmap_height(renderer->card_hybrid), 0, 0, CARD_WIDTH, CARD_HEIGHT, 0);
+
+      sprintf(text, "Hybrid:\n\n\nEffect:\n%d of damage!\n%d of shield\n\nCost:\n%d of energy!", effect, effect - 3, energy_cost);
       DrawScaledText(renderer->font, color, (CARD_WIDTH * 0.14) / xscale, (CARD_HEIGHT * 0.07) / yscale, xscale, yscale, ALLEGRO_ALIGN_LEFT, text);
   }
 
